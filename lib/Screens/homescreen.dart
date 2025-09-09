@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../widgets/uibutton.dart';
 import 'info_screen.dart'; // Import hinzufügen
 
 class HomeScreen extends StatefulWidget {
