@@ -2,23 +2,36 @@ import 'package:flutter/material.dart';
 import 'Screens/homescreen.dart';
 import 'package:device_preview/device_preview.dart';
 
+const bool useDevicePreview = false;
+
 void main() {
-  runApp(
-    DevicePreview(
-      enabled: true,
-      builder: (context) => MyApp(),
-    ),
-  );
+  if (useDevicePreview) 
+  {
+    runApp(
+      DevicePreview
+      (
+        enabled: true,
+        builder: (context) => const MyApp(useDevicePreview: true),
+      ),
+    );
+  } 
+  else 
+  {
+    runApp(const MyApp(useDevicePreview: false));
+  }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatelessWidget 
+{
+  final bool useDevicePreview;
+  const MyApp({super.key, required this.useDevicePreview});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     return MaterialApp(
       title: 'ShopList',
-      builder: DevicePreview.appBuilder,
+      builder: useDevicePreview ? DevicePreview.appBuilder : null,
       home: const HomeScreen(),
     );
   }
