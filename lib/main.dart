@@ -1,22 +1,19 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'Screens/homescreen.dart';
 import 'package:device_preview/device_preview.dart';
 
-const bool useDevicePreview = false;
+final bool useDevicePreview = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
 
 void main() {
-  if (useDevicePreview) 
-  {
+  if (useDevicePreview) {
     runApp(
-      DevicePreview
-      (
+      DevicePreview(
         enabled: true,
         builder: (context) => const MyApp(useDevicePreview: true),
       ),
     );
-  } 
-  else 
-  {
+  } else {
     runApp(const MyApp(useDevicePreview: false));
   }
 }
