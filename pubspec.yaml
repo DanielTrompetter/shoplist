@@ -20,6 +20,9 @@ dependencies:
   characters: ^1.4.0
   material_color_utilities: ^0.11.1
 
+  # Google Fonts für Inria Sans
+  google_fonts: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -28,3 +31,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/Title.png
