@@ -13,7 +13,7 @@ class Slbottomnavbar extends StatelessWidget {
       // selectedItemColor: Colors.green[700],
       selectedItemColor: Colors.grey,
       unselectedItemColor: Colors.grey,
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255,0xC3,0xE7,0xB5),
       elevation: 10,
       items:  
       [

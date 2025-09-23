@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget
     return MaterialApp(
       title: 'ShopList',
       builder: useDevicePreview ? DevicePreview.appBuilder : null,
-      home: const HomeScreen(),
+      home: HomeScreen(),
     );
   }
 }
