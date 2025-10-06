@@ -1,34 +1,51 @@
-import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shoplist/main.dart';
+import 'package:flutter/material.dart';
 
 class Slbottomnavbar extends StatelessWidget {
-  const Slbottomnavbar({super.key});
+  final Screen origin;
+
+  const Slbottomnavbar({super.key, required this.origin});
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar
-    (
-      // erstmal alles off, weil diese Pages kommen später!
-      // currentIndex: 0,
-      // selectedItemColor: Colors.green[700],
+    final items = _buildItemsForOrigin(context);
+
+    return BottomNavigationBar(
       selectedItemColor: Colors.grey,
       unselectedItemColor: Colors.grey,
-      backgroundColor: Color.fromARGB(255,0xC3,0xE7,0xB5),
+      backgroundColor: const Color.fromARGB(255, 0xC3, 0xE7, 0xB5),
       elevation: 10,
-      items:  
-      [
-        bottomnavitem(index: 0, icon: Icon(LucideIcons.info), label: 'Info'),
-        bottomnavitem(index: 1, icon: Icon(LucideIcons.user), label: 'Profil'),
-        bottomnavitem(index: 2, icon: Icon(LucideIcons.settings), label: 'Einstellungen'),
-      ],
+      items: items.map((e) => BottomNavigationBarItem(icon: e.icon, label: e.label)).toList(),
+      onTap: (index) => items[index].onTap(),
     );
   }
 
-  // index schon vorbereitet für spätere Nutzung in onTap!
-  BottomNavigationBarItem bottomnavitem({required int index, required Icon icon, required String label}) {
-    return BottomNavigationBarItem(
-        icon: icon,
-        label: label,
-      );
+  List<NavbarItem> _buildItemsForOrigin(BuildContext context) {
+    switch (origin) {
+      case Screen.HomeScreen:
+        return [
+          NavbarItem(icon: const Icon(LucideIcons.info), label: 'Info', onTap: () => Navigator.pushNamed(context, '/info')),
+          NavbarItem(icon: const Icon(LucideIcons.user), label: 'Profil', onTap: () => Navigator.pushNamed(context, '/profile')),
+        ];
+      case Screen.ListScreen:
+        return [
+          NavbarItem(icon: const Icon(LucideIcons.home), label: 'Home', onTap: () => Navigator.pushNamed(context, '/home')),
+          NavbarItem(icon: const Icon(LucideIcons.settings), label: 'Einstellungen', onTap: () => Navigator.pushNamed(context, '/settings')),
+        ];
+      default:
+        return [
+          NavbarItem(icon: const Icon(LucideIcons.home), label: 'Home', onTap: () => Navigator.pushNamed(context, '/home')),
+        ];
+    }
   }
 }
+
+class NavbarItem {
+  final Icon icon;
+  final String label;
+  final VoidCallback onTap;
+
+  NavbarItem({required this.icon, required this.label, required this.onTap});
+}
+

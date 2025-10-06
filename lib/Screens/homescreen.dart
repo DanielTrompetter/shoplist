@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shoplist/main.dart';
 import 'package:shoplist/widgets/bigbutton.dart';
-import '../widgets/Slbottomnavbar.dart';
+import '../widgets/slbottomnavbar.dart';
 import 'dart:ui'; // für den Blur!
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  static final List<ShopListButton> ShopLists = [
+  static final List<ShopListButton> shopLists = [
     ShopListButton(title: 'Familie', icon: LucideIcons.users, itemCount: 12, onPressed: () {}),
     ShopListButton(title: 'WG', icon: LucideIcons.home, itemCount: 8, onPressed: () {}),
     ShopListButton(title: 'Urlaub', icon: LucideIcons.sun, itemCount: 5, onPressed: () {}),
@@ -78,7 +79,7 @@ class HomeScreen extends StatelessWidget {
                     child: OverflowBox(
                       maxHeight: 240,
                       alignment: Alignment.topCenter,
-                      child: ShopListCaroussel(shopLists: ShopLists),
+                      child: ShopListCaroussel(shopLists: shopLists),
                     ),
                   ),
                 ),
@@ -96,7 +97,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const Slbottomnavbar(),
+      bottomNavigationBar: const Slbottomnavbar(origin: Screen.HomeScreen),
     );
   }
 }
@@ -118,14 +119,14 @@ class Buttonbox extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Bigbutton(
+              child: BigButton(
                 icon: Icons.group,
                 label: 'Mitglieder',
               ),
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: Bigbutton(
+              child: BigButton(
                 icon: Icons.star,
                 label: 'Favoriten verwalten',
               ),
@@ -182,7 +183,7 @@ class CenterRect extends StatelessWidget {
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     ElevatedButton(
                       onPressed: () {},
                       style: ButtonStyle(

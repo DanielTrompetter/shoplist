@@ -1,11 +1,25 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'Screens/homescreen.dart';
 import 'package:device_preview/device_preview.dart';
 
 final bool useDevicePreview = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
 
-void main() {
+enum Screen
+{
+  HomeScreen,
+  ListScreen
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   if (useDevicePreview) {
     runApp(
       DevicePreview(
@@ -29,7 +43,12 @@ class MyApp extends StatelessWidget
     return MaterialApp(
       title: 'ShopList',
       builder: useDevicePreview ? DevicePreview.appBuilder : null,
-      home: HomeScreen(),
+      initialRoute: '/home',
+      routes: {
+        '/home': (context) => HomeScreen(),
+        //'/showorders': (context) => OrderScreen(), 
+      },
+      debugShowCheckedModeBanner: false,
     );
   }
 }

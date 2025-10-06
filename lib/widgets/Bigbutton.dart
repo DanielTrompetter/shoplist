@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Bigbutton extends StatelessWidget {
+class BigButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback? onPressed;
 
-  const Bigbutton({
+  const BigButton({
     super.key,
     required this.label,
     required this.icon,
