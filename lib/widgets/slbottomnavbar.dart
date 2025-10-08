@@ -23,12 +23,12 @@ class Slbottomnavbar extends StatelessWidget {
 
   List<NavbarItem> _buildItemsForOrigin(BuildContext context) {
     switch (origin) {
-      case Screen.HomeScreen:
+      case Screen.homeScreen:
         return [
           NavbarItem(icon: const Icon(LucideIcons.info), label: 'Info', onTap: () => Navigator.pushNamed(context, '/info')),
           NavbarItem(icon: const Icon(LucideIcons.user), label: 'Profil', onTap: () => Navigator.pushNamed(context, '/profile')),
         ];
-      case Screen.ListScreen:
+      case Screen.listScreen:
         return [
           NavbarItem(icon: const Icon(LucideIcons.home), label: 'Home', onTap: () => Navigator.pushNamed(context, '/home')),
           NavbarItem(icon: const Icon(LucideIcons.settings), label: 'Einstellungen', onTap: () => Navigator.pushNamed(context, '/settings')),

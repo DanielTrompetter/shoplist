@@ -9,8 +9,8 @@ import 'package:device_preview/device_preview.dart';
 final bool useDevicePreview = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
 
 enum Screen {
-  HomeScreen,
-  ListScreen,
+  homeScreen,
+  listScreen,
 }
 
 void main() async {

@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const Slbottomnavbar(origin: Screen.HomeScreen),
+      bottomNavigationBar: const Slbottomnavbar(origin: Screen.homeScreen),
     );
   }
 }
