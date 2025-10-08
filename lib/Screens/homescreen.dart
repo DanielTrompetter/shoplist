@@ -187,11 +187,11 @@ class CenterRect extends StatelessWidget {
                     Text(
                       'Deine ShopLists in\nder Übersicht',
                       style: GoogleFonts.belanosima(
-                        fontSize: screenWidth * 0.05,
+                        fontSize: 16,
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 0),
                     ElevatedButton(
                       onPressed: () {},
                       style: ButtonStyle(
