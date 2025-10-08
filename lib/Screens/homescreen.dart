@@ -1,22 +1,48 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shoplist/DBInterface/dbinterface.dart';
 import 'package:shoplist/main.dart';
 import 'package:shoplist/widgets/bigbutton.dart';
-import '../widgets/slbottomnavbar.dart';
-import 'dart:ui'; // für den Blur!
+import 'package:shoplist/widgets/slbottomnavbar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  static final List<ShopListButton> shopLists = [
-    ShopListButton(title: 'Familie', icon: LucideIcons.users, itemCount: 12, onPressed: () {}),
-    ShopListButton(title: 'WG', icon: LucideIcons.home, itemCount: 8, onPressed: () {}),
-    ShopListButton(title: 'Urlaub', icon: LucideIcons.sun, itemCount: 5, onPressed: () {}),
-    ShopListButton(title: 'Party', icon: LucideIcons.beer, itemCount: 20, onPressed: () {}),
-    ShopListButton(title: 'Büro', icon: LucideIcons.briefcase, itemCount: 7, onPressed: () {}),
-  ];
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late DbInterface db;
+  late List<ShoppingList> shoppingLists;
+  late List<ShopListButton> shopListButtons;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialisierung
+    db = DbInterface();
+    shoppingLists = db.shoppinglists;
+
+    // Buttons aus den ShoppingLists generieren
+    shopListButtons = shoppingLists.map((list) {
+      return ShopListButton(
+        title: list.name,
+        icon: IconFactory.getIcon(list.iconName),
+        itemCount: list.shoppingItems.length,
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            '/listscreen',
+            arguments: list,
+          );
+        },
+      );
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,25 +56,15 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Hintergrundbild
           Positioned.fill(
-            child: Image.asset(
-              'assets/Neutral.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/Neutral.png', fit: BoxFit.cover),
           ),
-
-          // Blur
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 0.0, sigmaY: 20.0),
-              child: Container(
-                color: Colors.white.withAlpha(70),
-              ),
+              child: Container(color: Colors.white.withAlpha(70)),
             ),
           ),
-
-          // Inhalt
           SafeArea(
             child: Column(
               children: [
@@ -63,15 +79,9 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // CenterRect
-                Flexible(
-                  flex: 2,
-                  child: CenterRect(screenWidth: screenWidth),
-                ),
-
+                Flexible(flex: 2, child: CenterRect(screenWidth: screenWidth)),
                 const SizedBox(height: 16),
 
-                // Karussell
                 Flexible(
                   flex: 3,
                   child: Padding(
@@ -79,17 +89,16 @@ class HomeScreen extends StatelessWidget {
                     child: OverflowBox(
                       maxHeight: 240,
                       alignment: Alignment.topCenter,
-                      child: ShopListCaroussel(shopLists: shopLists),
+                      child: ShopListCaroussel(shopLists: shopListButtons),
                     ),
                   ),
                 ),
-
-                // Buttonbox nutzt verbleibende Höhe
+                // die beiden großen Buttons unten!
                 Expanded(
                   flex: 3,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Buttonbox(),
+                    child: const Buttonbox(),
                   ),
                 ),
               ],
@@ -101,7 +110,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
 
 class Buttonbox extends StatelessWidget {
   const Buttonbox({super.key});

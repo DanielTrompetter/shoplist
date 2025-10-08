@@ -1,15 +1,16 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'Screens/homescreen.dart';
+import 'package:shoplist/Screens/listscreen.dart';
+import 'package:shoplist/Screens/homescreen.dart';
+import 'package:shoplist/theme/themes.dart'; // ← Theme import
 import 'package:device_preview/device_preview.dart';
 
 final bool useDevicePreview = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
 
-enum Screen
-{
+enum Screen {
   HomeScreen,
-  ListScreen
+  ListScreen,
 }
 
 void main() async {
@@ -32,24 +33,24 @@ void main() async {
   }
 }
 
-class MyApp extends StatelessWidget 
-{
+class MyApp extends StatelessWidget {
   final bool useDevicePreview;
   const MyApp({super.key, required this.useDevicePreview});
 
   @override
-  Widget build(BuildContext context) 
-  {
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ShopList',
       builder: useDevicePreview ? DevicePreview.appBuilder : null,
+      theme: AppThemes.lightTheme,
+      darkTheme: AppThemes.darkTheme,
+      themeMode: ThemeMode.system, // ← automatisch Light/Dark
       initialRoute: '/home',
       routes: {
         '/home': (context) => HomeScreen(),
-        //'/showorders': (context) => OrderScreen(), 
+        '/listscreen': (context) => ListScreen(),
       },
       debugShowCheckedModeBanner: false,
     );
   }
 }
-
