@@ -264,7 +264,7 @@ class ShopListCaroussel extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         itemCount: shopLists.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 16), // Abstand zwischen Buttons
+        separatorBuilder: (_, _) => const SizedBox(width: 16), // Abstand zwischen Buttons
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 16), // schiebt Button nach oben

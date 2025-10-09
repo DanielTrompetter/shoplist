@@ -33,10 +33,6 @@ class Slbottomnavbar extends StatelessWidget {
           NavbarItem(icon: const Icon(LucideIcons.home), label: 'Home', onTap: () => Navigator.pushNamed(context, '/home')),
           NavbarItem(icon: const Icon(LucideIcons.settings), label: 'Einstellungen', onTap: () => Navigator.pushNamed(context, '/settings')),
         ];
-      default:
-        return [
-          NavbarItem(icon: const Icon(LucideIcons.home), label: 'Home', onTap: () => Navigator.pushNamed(context, '/home')),
-        ];
     }
   }
 }
