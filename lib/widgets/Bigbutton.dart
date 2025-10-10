@@ -47,7 +47,7 @@ class BigButton extends StatelessWidget {
               child: Text(
                 label,
                 style: GoogleFonts.inriaSans(
-                  fontSize: 16,
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),

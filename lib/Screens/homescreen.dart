@@ -60,6 +60,20 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Image.asset('assets/Neutral.png', fit: BoxFit.cover),
           ),
           Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x03D9D9D9), // 1% Alpha
+                    Color(0xFFC2C2C2), // 100% Alpha
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 0.0, sigmaY: 20.0),
               child: Container(color: Colors.white.withAlpha(70)),
@@ -181,24 +195,24 @@ class CenterRect extends StatelessWidget {
               child: SizedBox(
                 width: screenWidth * 0.45,
                 child: Column(
+                  spacing: 12.0,
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Deine ShopLists in\nder Übersicht',
                       style: GoogleFonts.belanosima(
-                        fontSize: 16,
+                        fontSize: 18,
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 0),
                     ElevatedButton(
                       onPressed: () {},
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(const Color(0xFF8686D7)),
                         shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       ),
@@ -216,21 +230,28 @@ class CenterRect extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ClipRect( // Clipping auf Stack-Ebene um das Bild an den Kanten zu beschneiden!
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(8),
+                  bottomRight: Radius.circular(8),
+                ),
                 child: Stack(
                   children: [
                     Positioned.fill(
                       child: Align(
                         alignment: Alignment.center,
-                        child: Transform.translate(
-                          offset: const Offset(80, 20),
-                          child: Transform.rotate(
-                            angle: -30 * (pi / 180),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(
-                                'assets/Title.png',
-                                fit: BoxFit.contain,
+                        child: Transform.scale(
+                          scale: 1.5,
+                          child: Transform.translate(
+                            offset: const Offset(50, 30),
+                            child: Transform.rotate(
+                              angle: -30 * (pi / 180),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12), // Bild-eigene Rundung
+                                child: Image.asset(
+                                  'assets/Title.png',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),

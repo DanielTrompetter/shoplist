@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shoplist/DBInterface/dbinterface.dart';
+import 'package:shoplist/widgets/squarebutton.dart';
 
 class ListButton extends StatelessWidget {
   final ShoppingItem item;
@@ -15,55 +16,69 @@ class ListButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // Hauptbutton für Editieren
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: item.shopped ? Colors.grey[300] : Colors.green[100],
-              foregroundColor: Colors.black87,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Hauptbutton mit Gradient
+          Expanded(
+            child: Material(
+              borderRadius: BorderRadius.circular(16),
               elevation: item.shopped ? 0 : 2,
-            ),
-            onPressed: onEdit,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(item.name, style: const TextStyle(fontSize: 16)),
-                Text('x${item.amount}', style: const TextStyle(fontWeight: FontWeight.w500)),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(width: 8),
-
-        // Status-Button mit Häkchen
-        SizedBox(
-          height: 48,
-          width: 48,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: item.shopped ? Colors.red[300] : Colors.green[400],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+              child: Ink(
+                decoration: BoxDecoration(
+                  gradient: item.shopped
+                      ? const LinearGradient(
+                          colors: [Color(0xFFE0E0E0), Color(0xFFB0B0B0)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        )
+                      : const LinearGradient(
+                          colors: [Color(0xFFC9C9F3), Color(0xFF9696D7)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.black12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: onEdit,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(item.name, style: const TextStyle(fontSize: 24, color: Colors.black87)),
+                        Text('x${item.amount}', style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black87)),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              padding: EdgeInsets.zero,
-              elevation: 2,
-            ),
-            onPressed: onToggleShopped,
-            child: Icon(
-              item.shopped ? Icons.close : Icons.check,
-              color: Colors.white,
             ),
           ),
-        ),
-      ],
+
+          const SizedBox(width: 8),
+
+          // Quadratischer Status-Button
+          SizedBox(
+            width: 56,
+            child: SquareButton(
+              isShopped: item.shopped,
+              icon: item.shopped ? Icons.close : Icons.check,
+              onPressed: onToggleShopped,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
-
