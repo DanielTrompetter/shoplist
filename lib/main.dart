@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shoplist/Screens/listscreen.dart';
 import 'package:shoplist/Screens/homescreen.dart';
-import 'package:shoplist/theme/themes.dart'; // ← Theme import
+import 'package:shoplist/Screens/newlist.dart';
+import 'package:shoplist/theme/themes.dart';
 import 'package:device_preview/device_preview.dart';
 
 final bool useDevicePreview = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
@@ -11,6 +12,7 @@ final bool useDevicePreview = Platform.isMacOS || Platform.isWindows || Platform
 enum Screen {
   homeScreen,
   listScreen,
+  newlist,
 }
 
 void main() async {
@@ -44,11 +46,23 @@ class MyApp extends StatelessWidget {
       builder: useDevicePreview ? DevicePreview.appBuilder : null,
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
-      themeMode: ThemeMode.system, // ← automatisch Light/Dark
+      themeMode: ThemeMode.system,
       initialRoute: '/home',
-      routes: {
-        '/home': (context) => HomeScreen(),
-        '/listscreen': (context) => ListScreen(),
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/home':
+            return MaterialPageRoute(builder: (_) => HomeScreen());
+          case '/listscreen':
+            return MaterialPageRoute(builder: (_) => ListScreen());
+          case '/newlist':
+            final args = settings.arguments;
+            if (args is String) {
+              return MaterialPageRoute(builder: (_) => NewListScreen(listName: args));
+            }
+            return MaterialPageRoute(builder: (_) => const NewListScreen(listName: 'Neue Liste'));
+          default:
+            return MaterialPageRoute(builder: (_) => HomeScreen());
+        }
       },
       debugShowCheckedModeBanner: false,
     );

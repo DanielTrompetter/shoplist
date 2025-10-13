@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shoplist/DBInterface/dbinterface.dart';
+import 'package:shoplist/Screens/newlist.dart';
 import 'package:shoplist/main.dart';
 import 'package:shoplist/widgets/bigbutton.dart';
 import 'package:shoplist/widgets/slbottomnavbar.dart';
@@ -207,7 +208,59 @@ class CenterRect extends StatelessWidget {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final TextEditingController controller = TextEditingController();
+                        final FocusNode focusNode = FocusNode();
+
+                        final String? listName = await showDialog<String>(
+                          context: context,
+                          builder: (context) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                // Tastatur nach Dialog-Render aktivieren
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  focusNode.requestFocus();
+                                });
+
+                                return AlertDialog(
+                                  title: const Text('Name der neuen Liste'),
+                                  content: TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    autofocus: true,
+                                    decoration: const InputDecoration(
+                                      hintText: 'z.B. Wocheneinkauf',
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Abbrechen'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        final name = controller.text.trim();
+                                        if (name.isNotEmpty) {
+                                          Navigator.pop(context, name);
+                                        }
+                                      },
+                                      child: const Text('Erstellen'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        );
+                        if (listName != null && listName.isNotEmpty) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NewListScreen(listName: listName),
+                            ),
+                          );
+                        }
+                    },
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(const Color(0xFF8686D7)),
                         shape: WidgetStateProperty.all(
