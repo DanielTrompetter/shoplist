@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:shoplist/DBInterface/dbinterface.dart';
 import 'package:shoplist/main.dart';
@@ -14,34 +13,49 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
-  late ShoppingList shoppingList;
+  ShoppingList? shoppingList;
 
-  // wenn sich was in der Liste geändert hat, neu holen und rendern!
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments as ShoppingList?;
-    if (args != null) {
-      shoppingList = args;
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is ShoppingList) {
+      setState(() {
+        shoppingList = args;
+      });
+    } else {
+      debugPrint('ALARM! List ist null oder kein ShoppingList-Objekt!');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (shoppingList.shoppingItems.isEmpty) {
+    if (shoppingList == null) {
       return const Scaffold(
-        body: Center(child: Text('Keine Liste übergeben')),
+        body: Center(child: Text('Lade Liste...')),
+      );
+    }
+
+    if (shoppingList!.shoppingItems.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(shoppingList!.name),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 4,
+        ),
+        body: const Center(child: Text('Diese Liste ist leer')),
+        bottomNavigationBar: const Slbottomnavbar(origin: Screen.homeScreen),
       );
     }
 
     // Gruppiere Items nach Kategorie
     final Map<String, List<ShoppingItem>> groupedItems = {};
-    for (var item in shoppingList.shoppingItems) {
+    for (var item in shoppingList!.shoppingItems) {
       groupedItems.putIfAbsent(item.category, () => []).add(item);
     }
 
     final List<Widget> categoryWidgets = [];
-
     for (var entry in groupedItems.entries) {
       categoryWidgets.add(
         Padding(
@@ -76,7 +90,7 @@ class _ListScreenState extends State<ListScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFE6F4EA),
       appBar: AppBar(
-        title: Text(shoppingList.name),
+        title: Text(shoppingList!.name),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 4,

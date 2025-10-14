@@ -43,26 +43,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ShopList',
-      builder: useDevicePreview ? DevicePreview.appBuilder : null,
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
       themeMode: ThemeMode.system,
       initialRoute: '/home',
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/home':
-            return MaterialPageRoute(builder: (_) => HomeScreen());
-          case '/listscreen':
-            return MaterialPageRoute(builder: (_) => ListScreen());
-          case '/newlist':
-            final args = settings.arguments;
-            if (args is String) {
-              return MaterialPageRoute(builder: (_) => NewListScreen(listName: args));
-            }
-            return MaterialPageRoute(builder: (_) => const NewListScreen(listName: 'Neue Liste'));
-          default:
-            return MaterialPageRoute(builder: (_) => HomeScreen());
-        }
+      routes: {
+        '/home': (context) => const HomeScreen(),
+        '/listscreen': (context) => const ListScreen(), // wichtig: const oder ohne Argumente
+        '/newlist': (context) => const NewListScreen(listName: 'Neue Liste'),
       },
       debugShowCheckedModeBanner: false,
     );
