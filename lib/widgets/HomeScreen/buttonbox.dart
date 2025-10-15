@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shoplist/widgets/Bigbutton.dart';
+import 'package:shoplist/widgets/bigbutton.dart';
 
 class Buttonbox extends StatelessWidget {
   const Buttonbox({super.key});

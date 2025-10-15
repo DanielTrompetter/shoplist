@@ -7,8 +7,9 @@ import 'package:shoplist/widgets/slbottomnavbar.dart';
 
 class NewListScreen extends StatefulWidget {
   final String listName;
+  final String iconName;
 
-  const NewListScreen({super.key, required this.listName});
+  const NewListScreen({super.key, required this.listName, required this.iconName});
 
   @override
   State<NewListScreen> createState() => _NewListScreenState();
@@ -23,7 +24,7 @@ class _NewListScreenState extends State<NewListScreen> {
     super.initState();
     newShoppingList = ShoppingList(
       name: widget.listName,
-      iconName: "Empty",
+      iconName: widget.iconName,
       shoppingItems: [],
     );
   }
@@ -69,8 +70,23 @@ class _NewListScreenState extends State<NewListScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE6F4EA),
+      //Appbar mit Namen der Liste und dem Icon links neben dem Namen
       appBar: AppBar(
-        title: Text(newShoppingList.name),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              ListTypeManager.iconMap[newShoppingList.iconName] ?? Icons.help_outline,
+              color: Colors.black87,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              newShoppingList.name,
+              style: const TextStyle(color: Colors.black87),
+            ),
+          ],
+        ),
+
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 4,

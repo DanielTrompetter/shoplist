@@ -5,7 +5,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shoplist/Screens/newlist.dart';
+import 'package:shoplist/Screens/newlistscreen.dart';
+import 'package:shoplist/widgets/NewListItem/newlistdialog.dart';
 
 class CenterRect extends StatelessWidget {
   const CenterRect({
@@ -39,71 +40,36 @@ class CenterRect extends StatelessWidget {
               child: SizedBox(
                 width: screenWidth * 0.45,
                 child: Column(
-                  spacing: 12.0,
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Deine ShopLists in\nder Übersicht',
                       style: GoogleFonts.belanosima(
-                        fontSize: 18,
-                        color: Colors.black87,
+                      fontSize: screenWidth * 0.05,
+                      color: Colors.black87,
                       ),
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        final TextEditingController controller = TextEditingController();
-                        final FocusNode focusNode = FocusNode();
-
-                        final String? listName = await showDialog<String>(
+                        final result = await showDialog<(String, String)>(
                           context: context,
-                          builder: (context) {
-                            return StatefulBuilder(
-                              builder: (context, setState) {
-                                // Tastatur nach Dialog-Render aktivieren
-                                WidgetsBinding.instance.addPostFrameCallback((_) {
-                                  focusNode.requestFocus();
-                                });
-
-                                return AlertDialog(
-                                  title: const Text('Name der neuen Liste'),
-                                  content: TextField(
-                                    controller: controller,
-                                    focusNode: focusNode,
-                                    autofocus: true,
-                                    decoration: const InputDecoration(
-                                      hintText: 'z.B. Wocheneinkauf',
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text('Abbrechen'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        final name = controller.text.trim();
-                                        if (name.isNotEmpty) {
-                                          Navigator.pop(context, name);
-                                        }
-                                      },
-                                      child: const Text('Erstellen'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
+                          builder: (context) => const NewListDialog(),
                         );
-                        if (listName != null && listName.isNotEmpty) {
+
+                        if (result != null) {
+                          final (name, iconName) = result;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => NewListScreen(listName: listName),
+                              builder: (context) => NewListScreen(
+                                listName: name,
+                                iconName: iconName,
+                              ),
                             ),
                           );
                         }
-                    },
+                      },
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(const Color(0xFF8686D7)),
                         shape: WidgetStateProperty.all(
@@ -139,7 +105,7 @@ class CenterRect extends StatelessWidget {
                         child: Transform.scale(
                           scale: 1.5,
                           child: Transform.translate(
-                            offset: const Offset(50, 30),
+                            offset: const Offset(70, 30),
                             child: Transform.rotate(
                               angle: -30 * (pi / 180),
                               child: ClipRRect(

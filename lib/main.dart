@@ -1,9 +1,12 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shoplist/Screens/infoscreen.dart';
 import 'package:shoplist/Screens/listscreen.dart';
 import 'package:shoplist/Screens/homescreen.dart';
-import 'package:shoplist/Screens/newlist.dart';
+import 'package:shoplist/Screens/newlistscreen.dart';
+import 'package:shoplist/Screens/profilescreen.dart';
+import 'package:shoplist/Screens/settingsscreen.dart';
 import 'package:shoplist/theme/themes.dart';
 import 'package:device_preview/device_preview.dart';
 
@@ -50,7 +53,10 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => const HomeScreen(),
         '/listscreen': (context) => const ListScreen(), // wichtig: const oder ohne Argumente
-        '/newlist': (context) => const NewListScreen(listName: 'Neue Liste'),
+        '/newlist': (context) => const NewListScreen(listName: '', iconName: '',),
+        '/infos': (context) => const InfoScreen(),
+        '/settings': (context) => const SettingsScreen(),
+        '/profile': (context) => const ProfileScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

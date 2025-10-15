@@ -11,7 +11,7 @@ class ShopListCaroussel extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return SizedBox(
-      height: 220,
+      height: screenWidth,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8),

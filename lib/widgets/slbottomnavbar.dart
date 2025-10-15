@@ -1,6 +1,7 @@
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shoplist/main.dart';
 import 'package:flutter/material.dart';
+import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
 
 class Slbottomnavbar extends StatelessWidget {
   final Screen origin;
@@ -61,7 +62,7 @@ class Slbottomnavbar extends StatelessWidget {
           NavbarItem(
             icon: const Icon(LucideIcons.info),
             label: 'Info',
-            onTap: () => Navigator.pushNamed(context, '/info'),
+            onTap: () => Navigator.pushNamed(context, '/infos'),
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.user),
@@ -73,8 +74,8 @@ class Slbottomnavbar extends StatelessWidget {
         return [
           NavbarItem(
             icon: const Icon(LucideIcons.home),
-            label: 'Home',
-            onTap: () => Navigator.pushNamed(context, '/home'),
+            label: 'Info',
+            onTap: () => Navigator.pushNamed(context, '/infos'),
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.settings),
@@ -85,15 +86,20 @@ class Slbottomnavbar extends StatelessWidget {
       case Screen.newlist:
         return [
           NavbarItem(
-            icon: const Icon(LucideIcons.home),
-            label: 'Home',
+            icon: const Icon(LucideIcons.save),
+            label: 'Fertig',
             onTap: () => Navigator.pushNamed(context, '/home'),
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.plus),
             label: 'Neuer Gegenstand',
             onTap: () {
-              // Hier kannst du z. B. einen Dialog öffnen oder zur Item-Erstellung navigieren
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const EditItemPopup(),
+              );
             },
           ),
           NavbarItem(

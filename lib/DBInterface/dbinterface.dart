@@ -2,18 +2,31 @@ import 'package:shoplist/config.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class IconFactory {
-  static final Map<String, IconData> _iconMap = {
+class ListTypeManager {
+  static final Map<String, IconData> iconMap = {
     'users': LucideIcons.users,
     'tent': LucideIcons.tent,
+    'Drogerie': LucideIcons.flaskConical,
     'beer': LucideIcons.beer,
   };
 
   static IconData getIcon(String name) {
-    return _iconMap[name] ?? LucideIcons.helpCircle; // fallback
+    return iconMap[name] ?? LucideIcons.helpCircle; // fallback
   }
 }
 
+class CategoryManager {
+  static final Map<String, IconData> categoryIcons = {
+    'Lebensmittel': LucideIcons.utensils,
+    'Drogerie': LucideIcons.flaskConical,
+    'Getränke': LucideIcons.beer,
+    'Snacks': LucideIcons.cookie,
+    'Gemüse': LucideIcons.salad,
+  };
+
+  static IconData getIcon(String category) =>
+      categoryIcons[category] ?? LucideIcons.helpCircle;
+}
 
 class ShoppingItem {
   String name;

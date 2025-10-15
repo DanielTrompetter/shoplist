@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     shopListButtons = shoppingLists.map((list) {
       return ShopListButton(
         title: list.name,
-        icon: IconFactory.getIcon(list.iconName),
+        icon: ListTypeManager.getIcon(list.iconName),
         itemCount: list.shoppingItems.length,
         onPressed: () {
           Navigator.pushNamed(
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 24),
+                // const SizedBox(height: 12),
                 Text(
                   'ShopList',
                   style: GoogleFonts.inriaSans(
@@ -92,17 +92,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 16),
+                // SizedBox(height: screenWidth*0.1),
 
                 Flexible(flex: 2, child: CenterRect(screenWidth: screenWidth)),
-                const SizedBox(height: 16),
+                SizedBox(height: 20),
 
                 Flexible(
                   flex: 3,
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: OverflowBox(
-                      maxHeight: 240,
+                      maxHeight: screenWidth*0.6,
                       alignment: Alignment.topCenter,
                       child: ShopListCaroussel(shopLists: shopListButtons),
                     ),
