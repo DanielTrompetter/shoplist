@@ -33,12 +33,14 @@ class ShoppingItem {
   String category;
   int amount;
   bool shopped;
+  bool isRemovable;
 
   ShoppingItem({
     required this.name,
     required this.category,
     required this.amount,
     this.shopped = false,
+    this.isRemovable = false,
   });
 }
 

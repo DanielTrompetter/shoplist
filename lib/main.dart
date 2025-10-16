@@ -10,6 +10,10 @@ import 'package:shoplist/Screens/settingsscreen.dart';
 import 'package:shoplist/theme/themes.dart';
 import 'package:device_preview/device_preview.dart';
 
+// Hive Imports
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+
 final bool useDevicePreview = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
 
 enum Screen {
@@ -20,6 +24,10 @@ enum Screen {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Hive Init
+  final appDocDir = await getApplicationDocumentsDirectory();
+  await Hive.initFlutter(appDocDir.path);
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -52,8 +60,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/home',
       routes: {
         '/home': (context) => const HomeScreen(),
-        '/listscreen': (context) => const ListScreen(), // wichtig: const oder ohne Argumente
-        '/newlist': (context) => const NewListScreen(listName: '', iconName: '',),
+        '/listscreen': (context) => const ListScreen(),
+        '/newlist': (context) => const NewListScreen(listName: '', iconName: ''),
         '/infos': (context) => const InfoScreen(),
         '/settings': (context) => const SettingsScreen(),
         '/profile': (context) => const ProfileScreen(),

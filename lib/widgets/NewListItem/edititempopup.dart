@@ -5,9 +5,10 @@ import 'package:shoplist/widgets/NewListItem/categorycarousselitem.dart';
 import 'package:shoplist/widgets/smallbutton.dart'; // falls du ShoppingItem brauchst
 
 class EditItemPopup extends StatefulWidget {
-  final ShoppingItem? item; // 👈 optionaler Parameter
+  final ShoppingItem? item; // optionaler Parameter zum editieren
+  final bool newItem;
 
-  const EditItemPopup({super.key, this.item});
+  const EditItemPopup({super.key, required this.item, required this.newItem});
 
   @override
   State<EditItemPopup> createState() => _EditItemPopupState();
@@ -30,8 +31,8 @@ class _EditItemPopupState extends State<EditItemPopup> {
       selectedCategory = item.category;
       amountController.text = item.amount.toString();
       nameController.text = item.name;
-      isFavorite = false; // oder item.isFavorite, falls du das später ergänzt
-      selectedUnit = 'Stk'; // oder item.unit, wenn du das speicherst
+      isFavorite = false; // oder item.isFavorite wenn es das irgendwann gibt
+      selectedUnit = 'Stk'; // oder item.unit? Muss noch in meine Daten!
     }
   }
 
@@ -87,7 +88,22 @@ class _EditItemPopupState extends State<EditItemPopup> {
                       offset: const Offset(2, -2),
                       child: SmallButton(
                         theIcon: const Icon(Icons.check),
-                        onTap: () => Navigator.pop(context),
+                        onTap: () {
+                        final name = nameController.text.trim();
+                        final amount = int.tryParse(amountController.text) ?? 1;
+
+                          if (name.isNotEmpty) {
+                            final item = ShoppingItem(
+                              name: name,
+                              category: selectedCategory,
+                              amount: amount,
+                              shopped: false,
+                            );
+                            Navigator.pop(context, item); // 👈 Rückgabe des neuen Items
+                          } else {
+                            Navigator.pop(context); // kein Item zurückgeben
+                          }
+                        },                      
                       ),
                     ),
                   ],
@@ -158,7 +174,9 @@ class _EditItemPopupState extends State<EditItemPopup> {
                           DropdownButton<String>(
                             value: selectedUnit,
                             underline: const SizedBox(),
-                            items: ['Stk', 'g', 'kg'].map((unit) {
+                            // Auswahl der Mengen Einheit, hardcodet im Moment, weiss nicht ob das später 
+                            // in ein Enum mit ner Map soll oder ob das so bleiben kann
+                            items: ['Stk', 'g', 'kg', 'L'].map((unit) {
                               return DropdownMenuItem(
                                 value: unit,
                                 child: Text(unit),

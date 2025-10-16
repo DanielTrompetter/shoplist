@@ -1,12 +1,20 @@
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:shoplist/main.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shoplist/DBInterface/dbinterface.dart';
+import 'package:shoplist/main.dart';
 import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
 
 class Slbottomnavbar extends StatelessWidget {
   final Screen origin;
+  final void Function(ShoppingItem)? onAddItem;
+  final VoidCallback? onSaveList;
 
-  const Slbottomnavbar({super.key, required this.origin});
+  const Slbottomnavbar({
+    super.key,
+    required this.origin,
+    this.onAddItem,
+    this.onSaveList,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +37,7 @@ class Slbottomnavbar extends StatelessWidget {
 
   Widget _buildIcon(Icon icon) {
     return Transform.translate(
-      offset: const Offset(0, 6), // z. B. 6 Pixel nach unten
+      offset: const Offset(0, 6),
       child: Container(
         width: 48,
         height: 48,
@@ -70,6 +78,7 @@ class Slbottomnavbar extends StatelessWidget {
             onTap: () => Navigator.pushNamed(context, '/profile'),
           ),
         ];
+
       case Screen.listScreen:
         return [
           NavbarItem(
@@ -83,23 +92,34 @@ class Slbottomnavbar extends StatelessWidget {
             onTap: () => Navigator.pushNamed(context, '/settings'),
           ),
         ];
+
       case Screen.newlist:
         return [
           NavbarItem(
             icon: const Icon(LucideIcons.save),
             label: 'Fertig',
-            onTap: () => Navigator.pushNamed(context, '/home'),
+            onTap: () {
+              if (onSaveList != null) {
+                onSaveList!(); // 👈 Liste speichern
+              } else {
+                Navigator.pushNamed(context, '/home'); // Fallback
+              }
+            },
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.plus),
             label: 'Neuer Gegenstand',
-            onTap: () {
-              showModalBottomSheet(
+            onTap: () async {
+              final newItem = await showModalBottomSheet<ShoppingItem>(
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
-                builder: (_) => const EditItemPopup(),
+                builder: (_) => const EditItemPopup(item: null, newItem: false),
               );
+
+              if (newItem != null && onAddItem != null) {
+                onAddItem!(newItem);
+              }
             },
           ),
           NavbarItem(

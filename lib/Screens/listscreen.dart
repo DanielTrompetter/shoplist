@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shoplist/DBInterface/dbinterface.dart';
 import 'package:shoplist/main.dart';
+import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
 import 'package:shoplist/widgets/listbutton.dart';
 import 'package:shoplist/widgets/slbottomnavbar.dart';
 
@@ -58,33 +59,111 @@ class _ListScreenState extends State<ListScreen> {
     final List<Widget> categoryWidgets = [];
     for (var entry in groupedItems.entries) {
       categoryWidgets.add(
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            entry.key,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFB2DFDB), Color(0xFFE0F2F1)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(20),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              dividerColor: Colors.transparent, // Trennstrich weg!
+            ),
+            child: ExpansionTile(
+              initiallyExpanded: true,
+              title: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  entry.key,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              children: [
+                  ...entry.value.map((item) {  // map() erzeugt Widgets, das doofe '...' entpackt sie in die children-Liste
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                    child: ListButton(
+                      item: item,
+                      onEdit: () async {
+                        final editedItem = await showModalBottomSheet<ShoppingItem>(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => EditItemPopup(item: item, newItem: false), // Item zum editieren übergeben
+                        );
+                        if (editedItem != null) {
+                          setState(() {
+                            // Ersetze das alte Item durch das neue
+                            final index = shoppingList!.shoppingItems.indexOf(item);
+                            if (index != -1) {
+                              shoppingList!.shoppingItems[index] = editedItem;
+                            }
+                          });
+                        }
+                      },
+                      // Switch zwischen geshoppt und löschen! Inklusive tollem Dialog xD
+                      onToggleShopped: () {
+                        if (item.isRemovable) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Eintrag löschen'),
+                              content: Text('Wirklich „${item.name}“ löschen?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context), // Abbrechen
+                                  child: const Text('Abbrechen'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      shoppingList!.shoppingItems.remove(item);
+                                    });
+                                    Navigator.pop(context); // Dialog schließen
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('„${item.name}“ wurde entfernt'),
+                                        duration: const Duration(seconds: 2),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                  child: const Text('Ja'),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          setState(() {
+                            item.shopped = !item.shopped;
+                            item.isRemovable = item.shopped;
+                          });
+                        }
+                      },
+                    ),
+                  );
+                }),
+                const SizedBox(height: 8), // Abstand unterhalb des letzten Items
+              ],
+            ),
           ),
         ),
       );
-
-      for (var item in entry.value) {
-        categoryWidgets.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: ListButton(
-              item: item,
-              onEdit: () {
-                // Item bearbeiten
-              },
-              onToggleShopped: () {
-                setState(() {
-                  item.shopped = !item.shopped;
-                });
-              },
-            ),
-          ),
-        );
-      }
     }
 
     return Scaffold(

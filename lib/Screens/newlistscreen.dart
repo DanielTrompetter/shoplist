@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shoplist/DBInterface/dbinterface.dart';
 import 'package:shoplist/main.dart';
+import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
 import 'package:shoplist/widgets/listbutton.dart';
 import 'package:shoplist/widgets/slbottomnavbar.dart';
 
@@ -19,6 +20,13 @@ class NewListScreen extends StatefulWidget {
 class _NewListScreenState extends State<NewListScreen> {
   late ShoppingList newShoppingList;
 
+  void addItem(ShoppingItem item) {
+    setState(() {
+      item.isRemovable = true;
+      newShoppingList.shoppingItems.add(item);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -28,7 +36,7 @@ class _NewListScreenState extends State<NewListScreen> {
       shoppingItems: [],
     );
   }
-  
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -116,7 +124,16 @@ class _NewListScreenState extends State<NewListScreen> {
           SafeArea(child: bodyContent),
         ],
       ),
-      bottomNavigationBar: const Slbottomnavbar(origin: Screen.newlist),
+      bottomNavigationBar: Slbottomnavbar(
+        origin: Screen.newlist,
+        onAddItem: addItem,
+        onSaveList: () {
+          if (newShoppingList.shoppingItems.isNotEmpty) {
+            DbInterface().shoppinglists.add(newShoppingList);
+          }
+          Navigator.pushNamed(context, '/home');
+        },
+      ),
     );
   }
 
@@ -145,12 +162,26 @@ class _NewListScreenState extends State<NewListScreen> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: ListButton(
               item: item,
-              onEdit: () {
-                // Item bearbeiten
+              onEdit: () async {
+                final editedItem = await showModalBottomSheet<ShoppingItem>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => EditItemPopup(item: item, newItem: true), // Item zum editieren übergeben
+                );
+                if (editedItem != null) {
+                  setState(() {
+                    // Ersetze das alte Item durch das neue
+                    final index = newShoppingList.shoppingItems.indexOf(item);
+                    if (index != -1) {
+                      newShoppingList.shoppingItems[index] = editedItem;
+                    }
+                  });
+                }
               },
               onToggleShopped: () {
                 setState(() {
-                  item.shopped = !item.shopped;
+                    newShoppingList.shoppingItems.remove(item); // wirklich löschen
                 });
               },
             ),

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class SquareButton extends StatelessWidget {
-  final IconData icon;
   final VoidCallback? onPressed;
   final bool isShopped;
+  final bool isRemovable; // sieht aus wie doppelgemoppelt, aber vielleicht bau ich damit noch andere Farben ein für entfernbare Items ein!
 
   const SquareButton({
     super.key,
-    required this.icon,
     this.onPressed,
     required this.isShopped,
+    required this.isRemovable,
   });
 
   @override
@@ -47,7 +47,7 @@ class SquareButton extends StatelessWidget {
             onTap: onPressed,
             child: Center(
               child: Icon(
-                isShopped ? Icons.close : Icons.check, size: 42, color: Colors.black),
+                (isShopped || isRemovable) ? Icons.close : Icons.check, size: 42, color: Colors.black),
             ),
           ),
         ),

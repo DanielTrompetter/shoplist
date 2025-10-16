@@ -68,12 +68,12 @@ class ListButton extends StatelessWidget {
 
           const SizedBox(width: 8),
 
-          // Quadratischer Status-Button
+          // Quadratischer Switch-Button, gekauft oder x für kann weg! xD
           SizedBox(
             width: 56,
             child: SquareButton(
               isShopped: item.shopped,
-              icon: item.shopped ? Icons.close : Icons.check,
+              isRemovable: item.isRemovable,
               onPressed: onToggleShopped,
             ),
           ),
