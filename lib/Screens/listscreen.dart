@@ -80,6 +80,7 @@ class _ListScreenState extends State<ListScreen> {
             data: Theme.of(context).copyWith(
               dividerColor: Colors.transparent, // Trennstrich weg!
             ),
+            // hier kommen die zur jeweiligen Kategorie gehörenden Items in einem ausklappbaren Tile! :-)
             child: ExpansionTile(
               initiallyExpanded: true,
               title: Padding(
