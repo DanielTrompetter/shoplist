@@ -14,7 +14,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
-final bool useDevicePreview = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+final bool useDevicePreview = !Platform.isAndroid && !Platform.isIOS;
 
 enum Screen {
   homeScreen,
