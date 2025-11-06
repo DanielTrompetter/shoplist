@@ -47,8 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: const Color(0xFFE6F4EA),
       appBar: AppBar(
@@ -61,63 +59,33 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Image.asset('assets/Neutral.png', fit: BoxFit.cover),
           ),
           Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0x03D9D9D9), // 1% Alpha
-                    Color(0xFFC2C2C2), // 100% Alpha
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 0.0, sigmaY: 20.0),
               child: Container(color: Colors.white.withAlpha(70)),
             ),
           ),
-          SafeArea(
-            child: Column(
-              children: [
-                // const SizedBox(height: 12),
-                Text(
-                  'ShopList',
-                  style: GoogleFonts.inriaSans(
-                    fontSize: screenWidth * 0.12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                // SizedBox(height: screenWidth*0.1),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final height = constraints.maxHeight;
 
-                Flexible(flex: 2, child: CenterRect(screenWidth: screenWidth)),
-                SizedBox(height: 20),
-
-                Flexible(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: OverflowBox(
-                      maxHeight: screenWidth*0.6,
-                      alignment: Alignment.topCenter,
+              return SafeArea(
+                child: Column(
+                  children: [
+                    SizedBox(height: height*0.03),
+                    SizedBox(
+                      height: height * 0.5,
+                      child: CenterRect(screenWidth: width),
+                    ),
+                    SizedBox(height: height*0.05),
+                    SizedBox(
+                      height: height * 0.4,
                       child: ShopListCaroussel(shopLists: shopListButtons),
                     ),
-                  ),
+                  ],
                 ),
-                // die beiden großen Buttons unten!
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: const Buttonbox(),
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -125,7 +93,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-
-
-

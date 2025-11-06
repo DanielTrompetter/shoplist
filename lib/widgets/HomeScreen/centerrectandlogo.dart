@@ -44,9 +44,9 @@ class CenterRect extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Deine ShopLists in\nder Übersicht',
+                      'Deine\nEinkaufslisten in der Übersicht',
                       style: GoogleFonts.belanosima(
-                      fontSize: screenWidth * 0.05,
+                      fontSize: screenWidth * 0.07,
                       color: Colors.black87,
                       ),
                     ),
@@ -105,7 +105,7 @@ class CenterRect extends StatelessWidget {
                         child: Transform.scale(
                           scale: 1.5,
                           child: Transform.translate(
-                            offset: const Offset(70, 30),
+                            offset: const Offset(80, 10),
                             child: Transform.rotate(
                               angle: -30 * (pi / 180),
                               child: ClipRRect(

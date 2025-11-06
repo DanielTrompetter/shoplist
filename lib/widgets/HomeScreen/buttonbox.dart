@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shoplist/Screens/newlistscreen.dart';
+import 'package:shoplist/widgets/NewListItem/newlistdialog.dart';
 import 'package:shoplist/widgets/bigbutton.dart';
 
 class Buttonbox extends StatelessWidget {
@@ -13,20 +15,31 @@ class Buttonbox extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           children: [
             Expanded(
               child: BigButton(
-                icon: Icons.group,
-                label: 'Mitglieder',
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: BigButton(
-                icon: Icons.star,
-                label: 'Favoriten verwalten',
+                icon: Icons.list,
+                label: 'Neue Liste',
+                onPressed: () async {
+                  final result = await showDialog<(String, String)>(
+                  context: context,
+                  builder: (context) => const NewListDialog(),
+                  );
+                  if (result != null) {
+                    final (name, iconName) = result;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NewListScreen(
+                          listName: name,
+                          iconName: iconName,
+                        ),
+                      ),
+                    );
+                  }
+                },
               ),
             ),
           ],
