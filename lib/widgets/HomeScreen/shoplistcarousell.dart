@@ -21,7 +21,7 @@ class _ShopListCarousselState extends State<ShopListCaroussel> {
 
   void _updateIndicator() {
     final screenWidth = MediaQuery.of(context).size.width;
-    final itemSize = screenWidth * 0.6 + 16;
+    final itemSize = screenWidth * 0.5 + 16;
     final index = (_scrollController.offset / itemSize).round();
     _currentIndex.value = index.clamp(0, widget.shopLists.length - 1);
   }
