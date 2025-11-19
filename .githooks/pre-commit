@@ -1,0 +1,16 @@
+#!/bin/bash
+# pre-commit hook: prüft auf falsche Line-Endings (CRLF) in Textdateien
+
+# Suche nach Dateien mit CRLF
+bad_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(dart|yaml|json|md|html|css|gradle|properties|xml|plist)$' | xargs grep -Il $'\r')
+
+if [ -n "$bad_files" ]; then
+  echo "Commit abgebrochen: folgende Dateien enthalten CRLF statt LF:"
+  echo "$bad_files"
+  echo "Bitte korrigiere mit: dos2unix <file> oder Editor-Einstellung ändern."
+  exit 1
+fi
+
+echo "✅ Line-Endings sauber. Commit läuft..."
+exit 0
+
