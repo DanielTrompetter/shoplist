@@ -1,4 +1,6 @@
+# -------------------------
 # Miscellaneous
+# -------------------------
 *.class
 *.log
 *.pyc
@@ -12,34 +14,82 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# -------------------------
+# IDE / Editor
+# -------------------------
 *.iml
 *.ipr
 *.iws
 .idea/
+.vscode/
+*.tmproj
+*.project
+*.sublime-workspace
+*.sublime-project
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
+# -------------------------
+# Flutter / Dart / Pub
+# -------------------------
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
 /build/
+coverage/
+generated_plugin_registrant.dart
 
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
+# -------------------------
+# Android
+# -------------------------
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/.gradle/
+/android/local.properties
+/android/key.properties
+
+# -------------------------
+# iOS
+# -------------------------
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/ServiceDefinitions.json
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Runner/Generated.xcconfig
+ios/Runner/Generated.*
+ios/Runner/GoogleService-Info.plist
+
+# -------------------------
+# Firebase / Config
+# -------------------------
+firebase.json
+# Falls du Prod/Dev getrennt hast, kannst du die Plists/JSONs für Dev ignorieren
+# und nur die Prod-Version im Repo behalten:
+# ios/Runner/GoogleService-Info-dev.plist
+# android/app/google-services-dev.json
+
+# -------------------------
+# macOS / Windows / Linux (falls gelöscht)
+# -------------------------
+macos/
+windows/
+linux/
+
+# -------------------------
+# Symbolication / Obfuscation
+# -------------------------
+app.*.symbols
+app.*.map.json
+
+# -------------------------
+# Other
+# -------------------------
+*.lock
+*.bak
+*.tmp
