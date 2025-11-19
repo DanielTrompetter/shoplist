@@ -51,6 +51,8 @@ generated_plugin_registrant.dart
 /android/.gradle/
 /android/local.properties
 /android/key.properties
+android/app/google-services.json
+android/app/google-services-dev.json
 
 # -------------------------
 # iOS
@@ -64,15 +66,14 @@ ios/Runner/GeneratedPluginRegistrant.*
 ios/Runner/Generated.xcconfig
 ios/Runner/Generated.*
 ios/Runner/GoogleService-Info.plist
+ios/Runner/GoogleService-Info-dev.plist
 
 # -------------------------
 # Firebase / Config
 # -------------------------
 firebase.json
-# Falls du Prod/Dev getrennt hast, kannst du die Plists/JSONs für Dev ignorieren
-# und nur die Prod-Version im Repo behalten:
-# ios/Runner/GoogleService-Info-dev.plist
-# android/app/google-services-dev.json
+lib/firebase_options.dart
+lib/firebase_options_dev.dart
 
 # -------------------------
 # macOS / Windows / Linux (falls gelöscht)
