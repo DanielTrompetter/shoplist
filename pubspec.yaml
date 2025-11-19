@@ -12,6 +12,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.0.14
+  provider: ^6.0.0
 
   # UI & Icons
   lucide_icons: ^0.257.0
@@ -19,16 +20,21 @@ dependencies:
   # Device Preview für responsives Testing
   device_preview: ^1.3.1
 
-  # Zusatzpakete, kompatibel mit Flutter SDK 3.8.1
   characters: ^1.4.0
   material_color_utilities: ^0.11.1
 
-  # Google Fonts für Inria Sans
   google_fonts: ^6.0.0
+
+  # Firebase
+  firebase_core: ^4.2.1 
+  cloud_firestore: ^6.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  hive_generator: ^2.0.0
+  build_runner: ^2.4.0
 
   flutter_lints: ^6.0.0
 

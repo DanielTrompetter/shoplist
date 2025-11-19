@@ -1,6 +1,8 @@
-import 'package:shoplist/config.dart';
+import 'package:shoplist/DBInterface/shopping_list.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:hive/hive.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ListTypeManager {
   static final Map<String, IconData> iconMap = {
@@ -22,91 +24,51 @@ class CategoryManager {
     'Getränke': LucideIcons.beer,
     'Snacks': LucideIcons.cookie,
     'Gemüse': LucideIcons.salad,
+    'Fleisch': LucideIcons.drumstick,
   };
 
   static IconData getIcon(String category) =>
       categoryIcons[category] ?? LucideIcons.helpCircle;
 }
 
-class ShoppingItem {
-  String name;
-  String category;
-  int amount;
-  bool shopped;
-  bool isRemovable;
-
-  ShoppingItem({
-    required this.name,
-    required this.category,
-    required this.amount,
-    this.shopped = false,
-    this.isRemovable = false,
-  });
-}
-
-class ShoppingList{
-  String name;
-  String iconName;
-  List<ShoppingItem> shoppingItems;
-
-  ShoppingList({
-    required this.name, 
-    required this.iconName, 
-    required this.shoppingItems
-  });
-}
-
+/// DbInterface mit Hive + Firestore Sync
 class DbInterface {
-  List<ShoppingList> shoppinglists = [];
+  final Box<ShoppingList> hiveBox;
+  final FirebaseFirestore? firestore;
 
-  DbInterface() {
-    if (Config.dbBaseUrl.isEmpty) {
-      shoppinglists = _generateFakeLists();
+  DbInterface({required this.hiveBox, required this.firestore}) {
+    // Firestore Listener starten wenn != null, dann Änderungen anderer User zurück ins lokale Hive
+    if(firestore != null)
+    {
+      firestore!.collection('shoppingLists').snapshots().listen((snapshot) {
+      for (var doc in snapshot.docs) {
+        var list = ShoppingList.fromMap(doc.data());
+        hiveBox.put(list.name, list);
+        }
+      });
     }
   }
 
-  List<ShoppingList> _generateFakeLists() {
-    return [
-      ShoppingList(
-        name: 'Familie',
-        iconName: 'users',
-        shoppingItems: [
-          ShoppingItem(name: 'Milch', category: 'Lebensmittel', amount: 2),
-          ShoppingItem(name: 'Windeln', category: 'Drogerie', amount: 1),
-          ShoppingItem(name: 'Toastbrot', category: 'Lebensmittel', amount: 1),
-          ShoppingItem(name: 'Waschmittel', category: 'Drogerie', amount: 1),
-          ShoppingItem(name: 'Äpfel', category: 'Obst & Gemüse', amount: 6),
-        ],
-      ),
-      ShoppingList(
-        name: 'Camping',
-        iconName: 'tent',
-        shoppingItems: [
-          ShoppingItem(name: 'Gaskartusche', category: 'Outdoor', amount: 2),
-          ShoppingItem(name: 'Brot', category: 'Lebensmittel', amount: 4),
-          ShoppingItem(name: 'Margarine', category: 'Lebensmittel', amount: 4),
-          ShoppingItem(name: 'Instant-Nudeln', category: 'Lebensmittel', amount: 4),
-          ShoppingItem(name: 'Feuchttücher',  category: 'Drogerie', amount: 1),
-          ShoppingItem(name: 'Mückenspray',  category: 'Drogerie', amount: 1),
-          ShoppingItem(name: 'Wasserflaschen',  category: 'Getränke', amount: 6),
-          ShoppingItem(name: 'Bananen', category: 'Obst & Gemüse', amount: 6),
-          ShoppingItem(name: 'Grillfleisch', category: 'Fleisch', amount: 6),
-          ShoppingItem(name: 'Würstchen', category: 'Fleisch', amount: 20),
-          ShoppingItem(name: 'Bier', category: 'Getränke', amount: 20),
-        ],
-      ),
-      ShoppingList(
-        name: 'Freunde',
-        iconName: 'beer',
-        shoppingItems: [
-          ShoppingItem(name: 'Chips', category: 'Snacks', amount: 3),
-          ShoppingItem(name: 'Bier', category: 'Getränke', amount: 12),
-          ShoppingItem(name: 'Cola', category: 'Getränke', amount: 6),
-          ShoppingItem(name: 'Eiswürfel', category: 'Sonstiges', amount: 2),
-          ShoppingItem(name: 'Servietten', category: 'Haushalt', amount: 1),
-        ],
-      ),
-    ];
+  Future<List<ShoppingList>> loadLists() async {
+    return hiveBox.values.toList();
+  }
+
+  Future<void> saveList(ShoppingList list) async {
+    // Lokal speichern
+    await hiveBox.put(list.name, list);
+
+    // Cloud speichern
+    if(firestore != null)
+    {
+      await firestore!.collection('shoppingLists').doc(list.name).set(list.toMap());
+    }
+  }
+
+  Future<void> deleteList(String name) async {
+    await hiveBox.delete(name);
+    if(firestore != null)
+    {
+      await firestore!.collection('shoppingLists').doc(name).delete();
+    }
   }
 }
-

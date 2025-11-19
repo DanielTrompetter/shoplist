@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shoplist/DBInterface/dbinterface.dart';
+import 'package:shoplist/DBInterface/shopping_item.dart';
 import 'package:shoplist/widgets/NewListItem/categorycarousselitem.dart';
-import 'package:shoplist/widgets/smallbutton.dart'; // falls du ShoppingItem brauchst
+import 'package:shoplist/widgets/smallbutton.dart';
 
 class EditItemPopup extends StatefulWidget {
   final ShoppingItem? item; // optionaler Parameter zum editieren

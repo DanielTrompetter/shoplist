@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:shoplist/DBInterface/dbinterface.dart';
-import 'package:shoplist/main.dart';
+import 'package:shoplist/DBInterface/shopping_item.dart';
+import 'package:shoplist/app_config.dart';
 import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
 
 class Slbottomnavbar extends StatelessWidget {
@@ -75,7 +75,7 @@ class Slbottomnavbar extends StatelessWidget {
           NavbarItem(
             icon: const Icon(LucideIcons.user),
             label: 'Profil',
-            onTap: () => Navigator.pushNamed(context, '/profile'),
+            onTap: () => Navigator.pushNamed(context, '/settings'),
           ),
         ];
 
@@ -89,7 +89,7 @@ class Slbottomnavbar extends StatelessWidget {
           NavbarItem(
             icon: const Icon(LucideIcons.settings),
             label: 'Einstellungen',
-            onTap: () => Navigator.pushNamed(context, '/settings'),
+            onTap: () => Navigator.pushNamed(context, '/profile'),
           ),
         ];
 

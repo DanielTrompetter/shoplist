@@ -1,7 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shoplist/DBInterface/dbinterface.dart';
-import 'package:shoplist/main.dart';
+import 'package:shoplist/DBInterface/shopping_item.dart';
+import 'package:shoplist/DBInterface/shopping_list.dart';
+import 'package:shoplist/app_config.dart';
 import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
 import 'package:shoplist/widgets/listbutton.dart';
 import 'package:shoplist/widgets/slbottomnavbar.dart';
@@ -19,6 +22,7 @@ class NewListScreen extends StatefulWidget {
 
 class _NewListScreenState extends State<NewListScreen> {
   late ShoppingList newShoppingList;
+  late DbInterface db;
 
   void addItem(ShoppingItem item) {
     setState(() {
@@ -40,6 +44,7 @@ class _NewListScreenState extends State<NewListScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    db = Provider.of<DbInterface>(context, listen: false);
   }
 
   @override
@@ -127,9 +132,9 @@ class _NewListScreenState extends State<NewListScreen> {
       bottomNavigationBar: Slbottomnavbar(
         origin: Screen.newlist,
         onAddItem: addItem,
-        onSaveList: () {
+        onSaveList: () async {
           if (newShoppingList.shoppingItems.isNotEmpty) {
-            DbInterface().shoppinglists.add(newShoppingList);
+            await db.saveList(newShoppingList);
           }
           Navigator.pushNamed(context, '/home');
         },

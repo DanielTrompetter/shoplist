@@ -1,7 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:shoplist/DBInterface/dbinterface.dart';
-import 'package:shoplist/main.dart';
+import 'package:shoplist/DBInterface/shopping_item.dart';
+import 'package:shoplist/DBInterface/shopping_list.dart';
+import 'package:shoplist/app_config.dart';
 import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
 import 'package:shoplist/widgets/listbutton.dart';
 import 'package:shoplist/widgets/slbottomnavbar.dart';

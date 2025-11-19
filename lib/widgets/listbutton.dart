@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shoplist/DBInterface/dbinterface.dart';
+import 'package:shoplist/DBInterface/shopping_item.dart';
 import 'package:shoplist/widgets/squarebutton.dart';
 
 class ListButton extends StatelessWidget {

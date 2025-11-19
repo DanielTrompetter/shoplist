@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shoplist/Screens/newlistscreen.dart';
+import 'package:shoplist/widgets/NewListItem/newlistdialog.dart';
 
 class ShopListCaroussel extends StatefulWidget {
   final List<ShopListButton> shopLists;
@@ -31,9 +33,55 @@ class _ShopListCarousselState extends State<ShopListCaroussel> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final buttonWidth = screenWidth * 0.5;
-    final buttonHeight = screenHeight * 0.20; // oder 0.3 je nach Geschmack
-    final carouselHeight = buttonHeight + 32; // Platz für Schatten + Padding
+    final buttonHeight = screenHeight * 0.20;
 
+    // Wenn keine Listen existieren dann nur einen Button mit "Liste erstellen"
+    if (widget.shopLists.isEmpty) {
+      return Center(
+        child: SizedBox(
+          width: buttonWidth,
+          height: buttonHeight,
+          child: ShopListButton(
+            title: 'Liste anlegen',
+            icon: Icons.add,
+            itemCount: 0,
+              onPressed: () async {
+                final result = await showDialog<(String, String)>(
+                  context: context,
+                  builder: (context) => const NewListDialog(),
+                );
+
+                if (result != null) {
+                  final (name, iconName) = result;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewListScreen(
+                        listName: name,
+                        iconName: iconName,
+                      ),
+                    ),
+                  );
+                }
+              },          
+            ),
+        ),
+      );
+    }
+
+    // Wenn genau eine Liste existiert:
+    if (widget.shopLists.length == 1) {
+      return Center(
+        child: SizedBox(
+          width: buttonWidth,
+          height: buttonHeight,
+          child: widget.shopLists.first,
+        ),
+      );
+    }
+
+    // Normales Karussell, wenn mehr als eine Liste vorhanden ist
+    final carouselHeight = buttonHeight + 32;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

@@ -1,6 +1,10 @@
-import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:shoplist/app_config.dart'; // dein Config-File
+import 'package:shoplist/DBInterface/dbinterface.dart';
+import 'package:shoplist/DBInterface/shopping_item.dart';
+import 'package:shoplist/DBInterface/shopping_list.dart';
 import 'package:shoplist/Screens/infoscreen.dart';
 import 'package:shoplist/Screens/listscreen.dart';
 import 'package:shoplist/Screens/homescreen.dart';
@@ -8,19 +12,14 @@ import 'package:shoplist/Screens/newlistscreen.dart';
 import 'package:shoplist/Screens/profilescreen.dart';
 import 'package:shoplist/Screens/settingsscreen.dart';
 import 'package:shoplist/theme/themes.dart';
-import 'package:device_preview/device_preview.dart';
-
-// Hive Imports
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-final bool useDevicePreview = !Platform.isAndroid && !Platform.isIOS;
-
-enum Screen {
-  homeScreen,
-  listScreen,
-  newlist,
-}
+// Firebase Optionen
+import 'firebase_options.dart' as prod;
+import 'firebase_options_dev.dart' as dev;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,26 +28,41 @@ void main() async {
   final appDocDir = await getApplicationDocumentsDirectory();
   await Hive.initFlutter(appDocDir.path);
 
+  // Firebase init mit Config-Schalter
+  await Firebase.initializeApp(
+    options: Config.useFinalFSDB
+        ? prod.DefaultFirebaseOptions.currentPlatform
+        : dev.DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // TypeAdapter registrieren
+  Hive.registerAdapter(ShoppingListAdapter());
+  Hive.registerAdapter(ShoppingItemAdapter());
+
+  // Box öffnen
+  final box = await Hive.openBox<ShoppingList>('shoppingLists');
+
+  // Firestore Instanz
+  final firestore = FirebaseFirestore.instance;
+
+  // DbInterface mit Hive + Firestore
+  final db = DbInterface(hiveBox: box, firestore: firestore);
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  if (useDevicePreview) {
-    runApp(
-      DevicePreview(
-        enabled: true,
-        builder: (context) => const MyApp(useDevicePreview: true),
-      ),
-    );
-  } else {
-    runApp(const MyApp(useDevicePreview: false));
-  }
+  runApp(
+    Provider<DbInterface>.value(
+      value: db,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  final bool useDevicePreview;
-  const MyApp({super.key, required this.useDevicePreview});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
