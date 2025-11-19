@@ -52,7 +52,7 @@ generated_plugin_registrant.dart
 /android/local.properties
 /android/key.properties
 android/app/google-services.json
-android/app/google-services-dev.json
+android/app/google-services_dev.json
 
 # -------------------------
 # iOS
@@ -66,7 +66,7 @@ ios/Runner/GeneratedPluginRegistrant.*
 ios/Runner/Generated.xcconfig
 ios/Runner/Generated.*
 ios/Runner/GoogleService-Info.plist
-ios/Runner/GoogleService-Info-dev.plist
+ios/Runner/GoogleService-Info_dev.plist
 
 # -------------------------
 # Firebase / Config
