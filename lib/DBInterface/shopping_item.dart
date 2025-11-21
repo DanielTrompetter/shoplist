@@ -19,12 +19,16 @@ class ShoppingItem {
   @HiveField(4)
   bool isRemovable;
 
+  @HiveField(5)
+  bool isFavorite;   // <--- NEU
+
   ShoppingItem({
     required this.name,
     required this.category,
     required this.amount,
     this.shopped = false,
     this.isRemovable = false,
+    this.isFavorite = false,   // <--- Default
   });
 
   Map<String, dynamic> toMap() => {
@@ -33,6 +37,7 @@ class ShoppingItem {
         'amount': amount,
         'shopped': shopped,
         'isRemovable': isRemovable,
+        'isFavorite': isFavorite,
       };
 
   factory ShoppingItem.fromMap(Map<String, dynamic> map) => ShoppingItem(
@@ -41,5 +46,6 @@ class ShoppingItem {
         amount: map['amount'],
         shopped: map['shopped'] ?? false,
         isRemovable: map['isRemovable'] ?? false,
+        isFavorite: map['isFavorite'] ?? false,
       );
 }
