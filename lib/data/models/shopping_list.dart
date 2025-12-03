@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:shoplist/DBInterface/shopping_item.dart';
+import 'package:shoplist/data/models/shopping_item.dart';
 
 part 'shopping_list.g.dart';
 

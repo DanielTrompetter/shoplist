@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shoplist/DBInterface/dbinterface.dart';
-import 'package:shoplist/DBInterface/shopping_item.dart';
-import 'package:shoplist/DBInterface/shopping_list.dart';
-import 'package:shoplist/Screens/homescreen.dart';
-import 'package:shoplist/Screens/infoscreen.dart';
-import 'package:shoplist/Screens/listscreen.dart';
-import 'package:shoplist/Screens/newlistscreen.dart';
-import 'package:shoplist/Screens/profilescreen.dart';
-import 'package:shoplist/Screens/settingsscreen.dart';
-import 'package:shoplist/theme/themes.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-
-// Firebase Optionen (nur Prod)
-import 'firebase_options.dart';
+import 'package:shoplist/core/firebase/firebase_options.dart';
+import 'package:shoplist/core/theme/themes.dart';
+import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/data/models/shopping_list.dart';
+import 'package:shoplist/data/repositories/dbinterface.dart';
+import 'package:shoplist/features/home/view/homescreen.dart';
+import 'package:shoplist/features/info/view/infoscreen.dart';
+import 'package:shoplist/features/profile/view/profilescreen.dart';
+import 'package:shoplist/features/settings/view/settingsscreen.dart';
+import 'package:shoplist/features/shoplist/view/listscreen.dart';
+import 'package:shoplist/features/shoplist/view/newlistscreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

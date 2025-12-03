@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shoplist/DBInterface/dbinterface.dart';
-import 'package:shoplist/DBInterface/shopping_item.dart';
-import 'package:shoplist/widgets/NewListItem/categorycarousselitem.dart';
-import 'package:shoplist/widgets/smallbutton.dart';
+import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/data/repositories/dbinterface.dart';
+import 'package:shoplist/shared/widgets/categorycarousselitem.dart';
+import 'package:shoplist/shared/widgets/smallbutton.dart';
 
 class EditItemPopup extends StatefulWidget {
   final ShoppingItem? item; // optionaler Parameter zum editieren

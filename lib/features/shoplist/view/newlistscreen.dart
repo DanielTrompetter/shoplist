@@ -1,13 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shoplist/DBInterface/dbinterface.dart';
-import 'package:shoplist/DBInterface/shopping_item.dart';
-import 'package:shoplist/DBInterface/shopping_list.dart';
-import 'package:shoplist/app_config.dart';
-import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
-import 'package:shoplist/widgets/listbutton.dart';
-import 'package:shoplist/widgets/slbottomnavbar.dart';
+import 'package:shoplist/core/app_config.dart';
+import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/data/models/shopping_list.dart';
+import 'package:shoplist/data/repositories/dbinterface.dart';
+import 'package:shoplist/shared/widgets/listbutton.dart';
+import 'package:shoplist/shared/widgets/edititempopup.dart';
+import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
 
 class NewListScreen extends StatefulWidget {
   final String listName;

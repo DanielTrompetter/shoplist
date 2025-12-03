@@ -5,8 +5,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shoplist/Screens/newlistscreen.dart';
-import 'package:shoplist/widgets/NewListItem/newlistdialog.dart';
+import 'package:shoplist/features/shoplist/view/newlistscreen.dart';
+import 'package:shoplist/shared/widgets/newlistdialog.dart';
 
 class CenterRect extends StatelessWidget {
   const CenterRect({

@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shoplist/DBInterface/shopping_item.dart';
-import 'package:shoplist/DBInterface/shopping_list.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:hive/hive.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/data/models/shopping_list.dart';
 
 class ListTypeManager {
   static final Map<String, IconData> iconMap = {

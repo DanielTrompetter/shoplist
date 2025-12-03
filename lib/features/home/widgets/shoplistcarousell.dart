@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shoplist/Screens/newlistscreen.dart';
-import 'package:shoplist/widgets/NewListItem/newlistdialog.dart';
+import 'package:shoplist/features/shoplist/view/newlistscreen.dart';
+import 'package:shoplist/shared/widgets/newlistdialog.dart';
 
 class ShopListCaroussel extends StatefulWidget {
   final List<ShopListButton> shopLists;

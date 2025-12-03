@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shoplist/DBInterface/dbinterface.dart';
+import 'package:shoplist/data/repositories/dbinterface.dart';
 
 class NewListDialog extends StatefulWidget {
   const NewListDialog({super.key});

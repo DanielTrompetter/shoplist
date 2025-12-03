@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:shoplist/DBInterface/shopping_item.dart';
-import 'package:shoplist/app_config.dart';
-import 'package:shoplist/widgets/NewListItem/edititempopup.dart';
+import 'package:shoplist/core/app_config.dart';
+import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/shared/widgets/edititempopup.dart';
 
 class Slbottomnavbar extends StatelessWidget {
   final Screen origin;
