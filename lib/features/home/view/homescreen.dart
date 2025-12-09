@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoplist/core/app_config.dart';
 import 'package:shoplist/data/models/shopping_list.dart';
 import 'package:shoplist/data/repositories/dbinterface.dart';
-import 'package:shoplist/main.dart';
+import 'package:shoplist/app.dart'; // hier steckt dein dbProvider
 import 'package:shoplist/features/home/widgets/centerrectandlogo.dart';
 import 'package:shoplist/features/home/widgets/shoplistcarousell.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   late Future<List<ShoppingList>> shoppingLists;
 
   @override
   void initState() {
     super.initState();
-    // DbInterface aus Provider holen
-    final db = Provider.of<DbInterface>(context, listen: false);
-    shoppingLists = db.loadLists();
+    // DbInterface aus Riverpod holen
+    shoppingLists = ref.read(dbProvider.future).then((db) => db.loadLists());
   }
 
   @override
@@ -63,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(
                       height: height * 0.4,
                       child: FutureBuilder<List<ShoppingList>>(
-                        future: this.shoppingLists,
+                        future: shoppingLists,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const Center(

@@ -6,19 +6,32 @@ part 'shopping_list.g.dart';
 @HiveType(typeId: 1)
 class ShoppingList {
   @HiveField(0)
-  String name;
+  final String name;
 
   @HiveField(1)
-  String iconName;
+  final String iconName;
 
   @HiveField(2)
-  List<ShoppingItem> shoppingItems;
+  final List<ShoppingItem> shoppingItems;
 
   ShoppingList({
     required this.name,
     required this.iconName,
     required this.shoppingItems,
   });
+
+  /// Hilfsmethode für Riverpod-State-Updates
+  ShoppingList copyWith({
+    String? name,
+    String? iconName,
+    List<ShoppingItem>? shoppingItems,
+  }) {
+    return ShoppingList(
+      name: name ?? this.name,
+      iconName: iconName ?? this.iconName,
+      shoppingItems: shoppingItems ?? this.shoppingItems,
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         'name': name,

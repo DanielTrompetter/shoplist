@@ -1,47 +1,40 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoplist/core/app_config.dart';
 import 'package:shoplist/data/models/shopping_item.dart';
 import 'package:shoplist/data/models/shopping_list.dart';
 import 'package:shoplist/shared/widgets/listbutton.dart';
 import 'package:shoplist/shared/widgets/edititempopup.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
+import 'package:shoplist/features/shoplist/providers/list_provider.dart'; // <- wichtig!
 
-class ListScreen extends StatefulWidget {
+class ListScreen extends ConsumerWidget {
   const ListScreen({super.key});
 
   @override
-  State<ListScreen> createState() => _ListScreenState();
-}
-
-class _ListScreenState extends State<ListScreen> {
-  ShoppingList? shoppingList;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  Widget build(BuildContext context, WidgetRef ref) {
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is ShoppingList) {
-      setState(() {
-        shoppingList = args;
-      });
-    } else {
-      debugPrint('ALARM! List ist null oder kein ShoppingList-Objekt!');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (shoppingList == null) {
+    if (args is! ShoppingList) {
       return const Scaffold(
-        body: Center(child: Text('Lade Liste...')),
+        body: Center(child: Text('ALARM! Keine ShoppingList übergeben!')),
       );
     }
 
-    if (shoppingList!.shoppingItems.isEmpty) {
+    // Initialisiere Provider mit bestehender Liste
+    final shoppingList = ref.watch(shoppingListProvider);
+    if (shoppingList.name.isEmpty) {
+      ref.read(shoppingListProvider.notifier).initialize(
+        name: args.name,
+        iconName: args.iconName,
+        initialItems: args.shoppingItems,
+      );
+    }
+
+    if (shoppingList.shoppingItems.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(shoppingList!.name),
+          title: Text(shoppingList.name),
           centerTitle: true,
           backgroundColor: Colors.white,
           elevation: 4,
@@ -53,134 +46,115 @@ class _ListScreenState extends State<ListScreen> {
 
     // Gruppiere Items nach Kategorie
     final Map<String, List<ShoppingItem>> groupedItems = {};
-    for (var item in shoppingList!.shoppingItems) {
+    for (var item in shoppingList.shoppingItems) {
       groupedItems.putIfAbsent(item.category, () => []).add(item);
     }
 
-    final List<Widget> categoryWidgets = [];
-    for (var entry in groupedItems.entries) {
-      categoryWidgets.add(
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFB2DFDB), Color(0xFFE0F2F1)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(20),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+    final categoryWidgets = groupedItems.entries.map((entry) {
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFB2DFDB), Color(0xFFE0F2F1)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          child: Theme(
-            data: Theme.of(context).copyWith(
-              dividerColor: Colors.transparent, // Trennstrich weg!
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(20),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
-            // hier kommen die zur jeweiligen Kategorie gehörenden Items in einem ausklappbaren Tile! :-)
-            child: ExpansionTile(
-              initiallyExpanded: true,
-              title: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Text(
-                  entry.key,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+          ],
+        ),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: true,
+            title: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                entry.key,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
                 ),
               ),
-              children: [
-                  ...entry.value.map((item) {  // map() erzeugt Widgets, das doofe '...' entpackt sie in die children-Liste
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                    child: ListButton(
-                      item: item,
-                      onEdit: () async {
-                        final editedItem = await showModalBottomSheet<ShoppingItem>(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => EditItemPopup(item: item, newItem: false), // Item zum editieren übergeben
-                        );
-                        if (editedItem != null) {
-                          setState(() {
-                            // Ersetze das alte Item durch das neue
-                            final index = shoppingList!.shoppingItems.indexOf(item);
-                            if (index != -1) {
-                              shoppingList!.shoppingItems[index] = editedItem;
-                            }
-                          });
-                        }
-                      },
-                      // Switch zwischen geshoppt und löschen! Inklusive tollem Dialog xD
-                      onToggleShopped: () {
-                        if (item.isRemovable) {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Eintrag löschen'),
-                              content: Text('Wirklich „${item.name}“ löschen?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context), // Abbrechen
-                                  child: const Text('Abbrechen'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      shoppingList!.shoppingItems.remove(item);
-                                    });
-                                    Navigator.pop(context); // Dialog schließen
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('„${item.name}“ wurde entfernt'),
-                                        duration: const Duration(seconds: 2),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  },
-                                  child: const Text('Ja'),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          setState(() {
-                            item.shopped = !item.shopped;
-                            item.isRemovable = item.shopped;
-                          });
-                        }
-                      },
-                    ),
-                  );
-                }),
-                const SizedBox(height: 8), // Abstand unterhalb des letzten Items
-              ],
             ),
+            children: [
+              ...entry.value.map((item) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                  child: ListButton(
+                    item: item,
+                    onEdit: () async {
+                      final editedItem = await showModalBottomSheet<ShoppingItem>(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => EditItemPopup(item: item, newItem: false),
+                      );
+                      if (editedItem != null) {
+                        final index = shoppingList.shoppingItems.indexOf(item);
+                        ref.read(shoppingListProvider.notifier).editItem(index, editedItem);
+                      }
+                    },
+                    onToggleShopped: () {
+                      if (item.isRemovable) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Eintrag löschen'),
+                            content: Text('Wirklich „${item.name}“ löschen?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Abbrechen'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  ref.read(shoppingListProvider.notifier).removeItem(item);
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('„${item.name}“ wurde entfernt'),
+                                      duration: const Duration(seconds: 2),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                },
+                                child: const Text('Ja'),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        ref.read(shoppingListProvider.notifier).toggleShopped(item);
+                      }
+                    },
+                  ),
+                );
+              }),
+              const SizedBox(height: 8),
+            ],
           ),
         ),
       );
-    }
+    }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFE6F4EA),
       appBar: AppBar(
-        title: Text(shoppingList!.name),
+        title: Text(shoppingList.name),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 4,
       ),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset('assets/Neutral.png', fit: BoxFit.cover),
-          ),
+          Positioned.fill(child: Image.asset('assets/Neutral.png', fit: BoxFit.cover)),
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(

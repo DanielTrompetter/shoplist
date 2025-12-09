@@ -5,22 +5,22 @@ part 'shopping_item.g.dart';
 @HiveType(typeId: 0)
 class ShoppingItem {
   @HiveField(0)
-  String name;
+  final String name;
 
   @HiveField(1)
-  String category;
+  final String category;
 
   @HiveField(2)
-  int amount;
+  final int amount;
 
   @HiveField(3)
-  bool shopped;
+  final bool shopped;
 
   @HiveField(4)
-  bool isRemovable;
+  final bool isRemovable;
 
   @HiveField(5)
-  bool isFavorite;   // <--- NEU
+  final bool isFavorite;   // <--- NEU
 
   ShoppingItem({
     required this.name,
@@ -30,6 +30,25 @@ class ShoppingItem {
     this.isRemovable = false,
     this.isFavorite = false,   // <--- Default
   });
+
+  /// Hilfsmethode für Riverpod-State-Updates
+  ShoppingItem copyWith({
+    String? name,
+    String? category,
+    int? amount,
+    bool? shopped,
+    bool? isRemovable,
+    bool? isFavorite,
+  }) {
+    return ShoppingItem(
+      name: name ?? this.name,
+      category: category ?? this.category,
+      amount: amount ?? this.amount,
+      shopped: shopped ?? this.shopped,
+      isRemovable: isRemovable ?? this.isRemovable,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         'name': name,

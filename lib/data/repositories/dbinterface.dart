@@ -15,9 +15,8 @@ class ListTypeManager {
     'beer': LucideIcons.beer,
   };
 
-  static IconData getIcon(String name) {
-    return iconMap[name] ?? LucideIcons.helpCircle; // fallback
-  }
+  static IconData getIcon(String name) =>
+      iconMap[name] ?? LucideIcons.helpCircle;
 }
 
 class CategoryManager {
@@ -38,16 +37,16 @@ class CategoryManager {
 class DbInterface {
   final Box<ShoppingList> hiveBox;
   final FirebaseFirestore? firestore;
-  late Box prefsBox;
-  late Box<ShoppingItem> favoritesBox; // <-- neue Box für Favoriten
+  final Box prefsBox;
+  final Box<ShoppingItem> favoritesBox;
 
-  DbInterface({required this.hiveBox, required this.firestore}) {
-    // Prefs-Box öffnen
-    Hive.openBox('prefs').then((box) => prefsBox = box);
-
-    // Favoriten-Box öffnen
-    Hive.openBox<ShoppingItem>('favorites').then((box) => favoritesBox = box);
-
+  DbInterface._({
+    required this.hiveBox,
+    required this.firestore,
+    required this.prefsBox,
+    required this.favoritesBox,
+  }) {
+    // Firestore → Sync mit Hive
     if (firestore != null) {
       firestore!
           .collection('shoppingLists')
@@ -62,18 +61,30 @@ class DbInterface {
     }
   }
 
+  /// Factory für FutureProvider
+  static Future<DbInterface> create({
+    required Box<ShoppingList> hiveBox,
+    required FirebaseFirestore firestore,
+  }) async {
+    final prefsBox = await Hive.openBox('prefs');
+    final favoritesBox = await Hive.openBox<ShoppingItem>('favorites');
+    return DbInterface._(
+      hiveBox: hiveBox,
+      firestore: firestore,
+      prefsBox: prefsBox,
+      favoritesBox: favoritesBox,
+    );
+  }
+
   // --- Favoriten-Handling ---
-  Future<List<ShoppingItem>> getFavorites() async {
-    return favoritesBox.values.toList();
-  }
+  Future<List<ShoppingItem>> getFavorites() async =>
+      favoritesBox.values.toList();
 
-  Future<void> saveToFavorites(ShoppingItem item) async {
-    await favoritesBox.put(item.name, item);
-  }
+  Future<void> saveToFavorites(ShoppingItem item) async =>
+      favoritesBox.put(item.name, item);
 
-  Future<void> removeFromFavorites(String name) async {
-    await favoritesBox.delete(name);
-  }
+  Future<void> removeFromFavorites(String name) async =>
+      favoritesBox.delete(name);
 
   // --- User-Handling ---
   Future<void> registerUser(String email, String password) async {
@@ -119,7 +130,7 @@ class DbInterface {
     await prefsBox.clear();
   }
 
-  // --- ShoppingLists wie gehabt ---
+  // --- ShoppingLists ---
   Future<List<ShoppingList>> loadLists() async => hiveBox.values.toList();
 
   Future<void> saveList(ShoppingList list) async {
