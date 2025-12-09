@@ -55,7 +55,7 @@ android/app/google-services.json
 android/app/google-services_dev.json
 
 # -------------------------
-# iOS
+# Xcode / iOS
 # -------------------------
 ios/Pods/
 ios/.symlinks/
@@ -67,6 +67,22 @@ ios/Runner/Generated.xcconfig
 ios/Runner/Generated.*
 ios/Runner/GoogleService-Info.plist
 ios/Runner/GoogleService-Info_dev.plist
+ios/Podfile.lock
+
+
+# Xcode user data & workspaces
+ios/Runner.xcodeproj/project.xcworkspace/
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# Xcode scheme management
+xcshareddata/
+
+# Derived data & build
+ios/DerivedData/
+ios/build/
 
 # -------------------------
 # Firebase / Config
