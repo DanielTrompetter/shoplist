@@ -46,23 +46,21 @@ class App extends ConsumerWidget {
 
     return dbAsync.when(
       data: (db) {
-        return MaterialApp(
-          title: 'ShopList',
-          theme: AppThemes.lightTheme,
-          darkTheme: AppThemes.darkTheme,
-          themeMode: ThemeMode.system,
-          initialRoute: '/home',
-          routes: {
-            '/home': (context) => const HomeScreen(),
-            '/listscreen': (context) => const ListScreen(),
-            '/newlist': (context) =>
-                const NewListScreen(listName: '', iconName: ''),
-            '/infos': (context) => const InfoScreen(),
-            '/settings': (context) => const SettingsScreen(),
-            '/profile': (context) => const ProfileScreen(),
-          },
-          debugShowCheckedModeBanner: false,
-        );
+      return MaterialApp(
+        title: 'ShopList',
+        theme: AppThemes.lightTheme,
+        darkTheme: AppThemes.darkTheme,
+        themeMode: ThemeMode.system,
+        home: const HomeScreen(), // ← Startet garantiert den HomeScreen
+        routes: {
+          '/listscreen': (context) => const ListScreen(),
+          '/newlist': (context) => const NewListScreen(listName: '', iconName: ''),
+          '/infos': (context) => const InfoScreen(),
+          '/settings': (context) => const SettingsScreen(),
+          '/profile': (context) => const ProfileScreen(),
+        },
+        debugShowCheckedModeBanner: false,
+      );
       },
       loading: () => const MaterialApp(
         home: Scaffold(
