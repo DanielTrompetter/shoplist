@@ -73,7 +73,6 @@ class ListButton extends StatelessWidget {
             width: 56,
             child: SquareButton(
               isShopped: item.shopped,
-              isRemovable: item.isRemovable,
               onPressed: onToggleShopped,
             ),
           ),

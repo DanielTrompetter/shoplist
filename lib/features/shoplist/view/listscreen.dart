@@ -102,7 +102,7 @@ class ListScreen extends ConsumerWidget {
                       }
                     },
                     onToggleShopped: () {
-                      if (item.isRemovable) {
+                      if (item.shopped) {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(

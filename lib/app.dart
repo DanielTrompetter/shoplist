@@ -7,9 +7,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:shoplist/core/firebase/firebase_options.dart';
 import 'package:shoplist/core/theme/themes.dart';
+import 'package:shoplist/data/models/fav_item.dart';
 import 'package:shoplist/data/models/shopping_item.dart';
 import 'package:shoplist/data/models/shopping_list.dart';
 import 'package:shoplist/data/repositories/dbinterface.dart';
+import 'package:shoplist/features/favorites/view/favlistscreen.dart';
 
 // Screens
 import 'package:shoplist/features/home/view/homescreen.dart';
@@ -32,9 +34,12 @@ final dbProvider = FutureProvider<DbInterface>((ref) async {
   Hive.registerAdapter(ShoppingListAdapter());
   Hive.registerAdapter(ShoppingItemAdapter());
   final box = await Hive.openBox<ShoppingList>('shoppingLists');
+  Hive.registerAdapter(FavItemAdapter());
+  final favBox = await Hive.openBox<FavItem>('favorites');
+
 
   // hier wird die 'factory' genutzt...
-  return await DbInterface.create(hiveBox: box, firestore: firestore);
+  return await DbInterface.create(ShopListBox: box, firestore: firestore);
 });
 
 class App extends ConsumerWidget {
@@ -54,6 +59,7 @@ class App extends ConsumerWidget {
         home: const HomeScreen(), // ← Startet garantiert den HomeScreen
         routes: {
           '/listscreen': (context) => const ListScreen(),
+          '/favscreen': (context) => const FavScreen(),
           '/newlist': (context) => const NewListScreen(listName: '', iconName: ''),
           '/infos': (context) => const InfoScreen(),
           '/settings': (context) => const SettingsScreen(),

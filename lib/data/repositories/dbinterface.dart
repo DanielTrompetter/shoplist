@@ -63,13 +63,13 @@ class DbInterface {
 
   /// Factory für FutureProvider
   static Future<DbInterface> create({
-    required Box<ShoppingList> hiveBox,
+    required Box<ShoppingList> ShopListBox,
     required FirebaseFirestore firestore,
   }) async {
     final prefsBox = await Hive.openBox('prefs');
     final favoritesBox = await Hive.openBox<ShoppingItem>('favorites');
     return DbInterface._(
-      hiveBox: hiveBox,
+      hiveBox: ShopListBox,
       firestore: firestore,
       prefsBox: prefsBox,
       favoritesBox: favoritesBox,

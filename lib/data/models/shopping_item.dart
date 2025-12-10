@@ -16,19 +16,11 @@ class ShoppingItem {
   @HiveField(3)
   final bool shopped;
 
-  @HiveField(4)
-  final bool isRemovable;
-
-  @HiveField(5)
-  final bool isFavorite;   // <--- NEU
-
   ShoppingItem({
     required this.name,
     required this.category,
     required this.amount,
     this.shopped = false,
-    this.isRemovable = false,
-    this.isFavorite = false,   // <--- Default
   });
 
   /// Hilfsmethode für Riverpod-State-Updates
@@ -37,16 +29,12 @@ class ShoppingItem {
     String? category,
     int? amount,
     bool? shopped,
-    bool? isRemovable,
-    bool? isFavorite,
   }) {
     return ShoppingItem(
       name: name ?? this.name,
       category: category ?? this.category,
       amount: amount ?? this.amount,
       shopped: shopped ?? this.shopped,
-      isRemovable: isRemovable ?? this.isRemovable,
-      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 
@@ -55,8 +43,6 @@ class ShoppingItem {
         'category': category,
         'amount': amount,
         'shopped': shopped,
-        'isRemovable': isRemovable,
-        'isFavorite': isFavorite,
       };
 
   factory ShoppingItem.fromMap(Map<String, dynamic> map) => ShoppingItem(
@@ -64,7 +50,5 @@ class ShoppingItem {
         category: map['category'],
         amount: map['amount'],
         shopped: map['shopped'] ?? false,
-        isRemovable: map['isRemovable'] ?? false,
-        isFavorite: map['isFavorite'] ?? false,
       );
 }

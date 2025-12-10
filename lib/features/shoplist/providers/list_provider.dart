@@ -15,7 +15,7 @@ class ShoppingListNotifier extends Notifier<ShoppingList> {
   }
 
   void addItem(ShoppingItem item) {
-    final newItem = item.copyWith(isRemovable: true);
+    final newItem = item.copyWith();
     state = state.copyWith(shoppingItems: [...state.shoppingItems, newItem]);
   }
 
@@ -36,7 +36,6 @@ class ShoppingListNotifier extends Notifier<ShoppingList> {
     if (index != -1) {
       final updated = items[index].copyWith(
         shopped: !items[index].shopped,
-        isRemovable: !items[index].shopped,
       );
       items[index] = updated;
       state = state.copyWith(shoppingItems: items);
