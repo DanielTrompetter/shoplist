@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart' show kReleaseMode;
+import 'package:flutter/widgets.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:hive/hive.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shoplist/data/models/shopping_item.dart';
+
 import 'package:shoplist/data/models/shopping_list.dart';
+import 'package:shoplist/data/models/fav_item.dart';
 
 class ListTypeManager {
   static final Map<String, IconData> iconMap = {
@@ -36,15 +37,15 @@ class CategoryManager {
 /// DbInterface mit Hive + Firestore Sync
 class DbInterface {
   final Box<ShoppingList> hiveBox;
-  final FirebaseFirestore? firestore;
+  final Box<FavItem> favoritesBox;
   final Box prefsBox;
-  final Box<ShoppingItem> favoritesBox;
+  final FirebaseFirestore? firestore;
 
   DbInterface._({
     required this.hiveBox,
-    required this.firestore,
-    required this.prefsBox,
     required this.favoritesBox,
+    required this.prefsBox,
+    required this.firestore,
   }) {
     // Firestore → Sync mit Hive
     if (firestore != null) {
@@ -61,26 +62,27 @@ class DbInterface {
     }
   }
 
-  /// Factory für FutureProvider
+  /// Einzige Factory für FutureProvider
   static Future<DbInterface> create({
-    required Box<ShoppingList> ShopListBox,
     required FirebaseFirestore firestore,
   }) async {
+    final hiveBox = await Hive.openBox<ShoppingList>('shoppingLists');
+    final favoritesBox = await Hive.openBox<FavItem>('favorites');
     final prefsBox = await Hive.openBox('prefs');
-    final favoritesBox = await Hive.openBox<ShoppingItem>('favorites');
+
     return DbInterface._(
-      hiveBox: ShopListBox,
-      firestore: firestore,
-      prefsBox: prefsBox,
+      hiveBox: hiveBox,
       favoritesBox: favoritesBox,
+      prefsBox: prefsBox,
+      firestore: firestore,
     );
   }
 
-  // --- Favoriten-Handling ---
-  Future<List<ShoppingItem>> getFavorites() async =>
+  // --- Favoriten-Handling (nur lokal in Hive) ---
+  Future<List<FavItem>> getFavorites() async =>
       favoritesBox.values.toList();
 
-  Future<void> saveToFavorites(ShoppingItem item) async =>
+  Future<void> saveToFavorites(FavItem item) async =>
       favoritesBox.put(item.name, item);
 
   Future<void> removeFromFavorites(String name) async =>

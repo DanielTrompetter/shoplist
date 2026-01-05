@@ -22,24 +22,24 @@ import 'package:shoplist/features/shoplist/view/listscreen.dart';
 import 'package:shoplist/features/shoplist/view/newlistscreen.dart';
 
 // Riverpod FutureProvider für DbInterface
+// dbProvider
 final dbProvider = FutureProvider<DbInterface>((ref) async {
   final appDocDir = await getApplicationDocumentsDirectory();
   await Hive.initFlutter(appDocDir.path);
+
+  // Adapter registrieren
+  Hive.registerAdapter(ShoppingListAdapter());
+  Hive.registerAdapter(ShoppingItemAdapter());
+  Hive.registerAdapter(FavItemAdapter());
 
   final app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   final firestore = FirebaseFirestore.instanceFor(app: app);
 
-  Hive.registerAdapter(ShoppingListAdapter());
-  Hive.registerAdapter(ShoppingItemAdapter());
-  final box = await Hive.openBox<ShoppingList>('shoppingLists');
-  Hive.registerAdapter(FavItemAdapter());
-  final favBox = await Hive.openBox<FavItem>('favorites');
-
-
-  // hier wird die 'factory' genutzt...
-  return await DbInterface.create(ShopListBox: box, firestore: firestore);
+  return await DbInterface.create(
+    firestore: firestore,
+  );
 });
 
 class App extends ConsumerWidget {
@@ -58,6 +58,7 @@ class App extends ConsumerWidget {
         themeMode: ThemeMode.system,
         home: const HomeScreen(), // ← Startet garantiert den HomeScreen
         routes: {
+          '/home':  (context) => const HomeScreen(),
           '/listscreen': (context) => const ListScreen(),
           '/favscreen': (context) => const FavScreen(),
           '/newlist': (context) => const NewListScreen(listName: '', iconName: ''),

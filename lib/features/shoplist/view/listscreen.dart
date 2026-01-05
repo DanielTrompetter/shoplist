@@ -21,20 +21,23 @@ class ListScreen extends ConsumerWidget {
       );
     }
 
-    // Initialisiere Provider mit bestehender Liste
     final shoppingList = ref.watch(shoppingListProvider);
+
+    // Initialisierung verzögert nach dem ersten Frame
     if (shoppingList.name.isEmpty) {
-      ref.read(shoppingListProvider.notifier).initialize(
-        name: args.name,
-        iconName: args.iconName,
-        initialItems: args.shoppingItems,
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(shoppingListProvider.notifier).initialize(
+          name: args.name,
+          iconName: args.iconName,
+          initialItems: args.shoppingItems,
+        );
+      });
     }
 
     if (shoppingList.shoppingItems.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(shoppingList.name),
+          title: Text(shoppingList.name.isEmpty ? args.name : shoppingList.name),
           centerTitle: true,
           backgroundColor: Colors.white,
           elevation: 4,
@@ -89,6 +92,7 @@ class ListScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                   child: ListButton(
                     item: item,
+                    isNewItem: false,
                     onEdit: () async {
                       final editedItem = await showModalBottomSheet<ShoppingItem>(
                         context: context,

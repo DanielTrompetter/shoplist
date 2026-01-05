@@ -23,13 +23,17 @@ class NewListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // State aus dem Notifier lesen
     final shoppingList = ref.watch(shoppingListProvider);
 
-    // Initialisierung einmalig setzen
+    // Initialisierung verzögert nach dem ersten Frame
     if (shoppingList.name.isEmpty) {
-      ref.read(shoppingListProvider.notifier)
-          .initialize(name: listName, iconName: iconName);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(shoppingListProvider.notifier).initialize(
+          name: listName,
+          iconName: iconName,
+          initialItems: const [],
+        );
+      });
     }
 
     final bodyContent = shoppingList.shoppingItems.isEmpty
@@ -137,6 +141,7 @@ class NewListScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: ListButton(
             item: item,
+            isNewItem: true,
             onEdit: () async {
               final editedItem = await showModalBottomSheet<ShoppingItem>(
                 context: context,
@@ -146,13 +151,11 @@ class NewListScreen extends ConsumerWidget {
               );
               if (editedItem != null) {
                 final index = shoppingList.shoppingItems.indexOf(item);
-                final newItems = [...shoppingList.shoppingItems];
-                newItems[index] = editedItem;
                 ref.read(shoppingListProvider.notifier).editItem(index, editedItem);
               }
             },
             onToggleShopped: () {
-              ref.read(shoppingListProvider.notifier).toggleShopped(item);
+              ref.read(shoppingListProvider.notifier).removeItem(item);
             },
           ),
         );

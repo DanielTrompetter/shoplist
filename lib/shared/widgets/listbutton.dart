@@ -4,12 +4,14 @@ import 'package:shoplist/shared/widgets/squarebutton.dart';
 
 class ListButton extends StatelessWidget {
   final ShoppingItem item;
+  final bool isNewItem;
   final VoidCallback? onEdit;
   final VoidCallback? onToggleShopped;
 
   const ListButton({
     super.key,
     required this.item,
+    required this.isNewItem,
     this.onEdit,
     this.onToggleShopped,
   });
@@ -72,7 +74,7 @@ class ListButton extends StatelessWidget {
           SizedBox(
             width: 56,
             child: SquareButton(
-              isShopped: item.shopped,
+              isShopped: isNewItem || item.shopped,
               onPressed: onToggleShopped,
             ),
           ),
