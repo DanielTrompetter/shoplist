@@ -56,7 +56,7 @@ class App extends ConsumerWidget {
         theme: AppThemes.lightTheme,
         darkTheme: AppThemes.darkTheme,
         themeMode: ThemeMode.system,
-        home: const HomeScreen(), // ← Startet garantiert den HomeScreen
+        home: const HomeScreen(), // startet garantiert den HomeScreen!
         routes: {
           '/home':  (context) => const HomeScreen(),
           '/listscreen': (context) => const ListScreen(),
