@@ -1,9 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:hive/hive.dart';
+
+// Firebase deaktiviert!
+/*
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+*/
 
 import 'package:shoplist/data/models/shopping_list.dart';
 import 'package:shoplist/data/models/fav_item.dart';
@@ -34,51 +38,46 @@ class CategoryManager {
       categoryIcons[category] ?? LucideIcons.helpCircle;
 }
 
-/// DbInterface mit Hive + Firestore Sync
+/// DbInterface – aktuell nur Hive, Firestore deaktiviert
 class DbInterface {
   final Box<ShoppingList> hiveBox;
   final Box<FavItem> favoritesBox;
+
+  // prefsBox & firestore deaktiviert:
+  /*
   final Box prefsBox;
   final FirebaseFirestore? firestore;
+  */
 
   DbInterface._({
     required this.hiveBox,
     required this.favoritesBox,
+    /*
     required this.prefsBox,
     required this.firestore,
-  }) {
-    // Firestore → Sync mit Hive
-    if (firestore != null) {
-      firestore!
-          .collection('shoppingLists')
-          .where('env', isEqualTo: kReleaseMode ? 'prod' : 'dev')
-          .snapshots()
-          .listen((snapshot) {
-        for (var doc in snapshot.docs) {
-          var list = ShoppingList.fromMap(doc.data());
-          hiveBox.put(list.name, list);
-        }
-      });
-    }
-  }
+    */
+  });
 
-  /// Einzige Factory für FutureProvider
-  static Future<DbInterface> create({
-    required FirebaseFirestore firestore,
-  }) async {
+  /// Factory für Riverpod FutureProvider
+  static Future<DbInterface> create() async {
     final hiveBox = await Hive.openBox<ShoppingList>('shoppingLists');
     final favoritesBox = await Hive.openBox<FavItem>('favorites');
+
+    /*
     final prefsBox = await Hive.openBox('prefs');
+    */
 
     return DbInterface._(
       hiveBox: hiveBox,
       favoritesBox: favoritesBox,
+      /*
       prefsBox: prefsBox,
       firestore: firestore,
+      */
     );
   }
 
-  // --- Favoriten-Handling (nur lokal in Hive) ---
+  // --- Favoriten-Handling ---
   Future<List<FavItem>> getFavorites() async =>
       favoritesBox.values.toList();
 
@@ -88,7 +87,8 @@ class DbInterface {
   Future<void> removeFromFavorites(String name) async =>
       favoritesBox.delete(name);
 
-  // --- User-Handling ---
+  // --- User-Handling (Firebase deaktiviert) ---
+  /*
   Future<void> registerUser(String email, String password) async {
     final auth = FirebaseAuth.instance;
     final userCredential = await auth.createUserWithEmailAndPassword(
@@ -131,23 +131,31 @@ class DbInterface {
     await FirebaseAuth.instance.signOut();
     await prefsBox.clear();
   }
+  */
 
   // --- ShoppingLists ---
-  Future<List<ShoppingList>> loadLists() async => hiveBox.values.toList();
+  Future<List<ShoppingList>> loadLists() async =>
+      hiveBox.values.toList();
 
   Future<void> saveList(ShoppingList list) async {
     await hiveBox.put(list.name, list);
+
+    /*
     if (firestore != null) {
       final data = list.toMap();
       data['env'] = kReleaseMode ? 'prod' : 'dev';
       await firestore!.collection('shoppingLists').doc(list.name).set(data);
     }
+    */
   }
 
   Future<void> deleteList(String name) async {
     await hiveBox.delete(name);
+
+    /*
     if (firestore != null) {
       await firestore!.collection('shoppingLists').doc(name).delete();
     }
+    */
   }
 }
