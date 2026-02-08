@@ -5,13 +5,27 @@ import 'package:shoplist/data/models/shopping_list.dart';
 class ShoppingListNotifier extends Notifier<ShoppingList> {
   @override
   ShoppingList build() {
-    // Leerer Default-State; wird nach dem Erstellen via initialize() gesetzt.
     return ShoppingList(name: '', iconName: '', shoppingItems: []);
   }
 
-  // Einmalige Initialisierung (z. B. beim Screen-Aufbau)
-  void initialize({required String name, required String iconName, List<ShoppingItem> initialItems = const []}) {
-    state = ShoppingList(name: name, iconName: iconName, shoppingItems: [...initialItems]);
+  void reset() {
+    state = ShoppingList(
+      name: '',
+      iconName: '',
+      shoppingItems: [],
+    );
+  }
+
+  void initialize({
+    required String name,
+    required String iconName,
+    List<ShoppingItem> initialItems = const [],
+  }) {
+    state = ShoppingList(
+      name: name,
+      iconName: iconName,
+      shoppingItems: [...initialItems],
+    );
   }
 
   void addItem(ShoppingItem item) {
@@ -43,6 +57,7 @@ class ShoppingListNotifier extends Notifier<ShoppingList> {
   }
 }
 
-/// Riverpod 3: NotifierProvider (ohne Family), autoDispose optional
 final shoppingListProvider =
-    NotifierProvider.autoDispose<ShoppingListNotifier, ShoppingList>(ShoppingListNotifier.new);
+    NotifierProvider.autoDispose<ShoppingListNotifier, ShoppingList>(
+  ShoppingListNotifier.new,
+);

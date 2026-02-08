@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:hive/hive.dart';

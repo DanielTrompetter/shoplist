@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shoplist/features/home/widgets/carousellbutton.dart';
 import 'package:shoplist/features/shoplist/view/newlistscreen.dart';
 import 'package:shoplist/shared/widgets/newlistdialog.dart';
 
@@ -23,7 +24,7 @@ class _ShopListCarousselState extends State<ShopListCaroussel> {
 
   void _updateIndicator() {
     final screenWidth = MediaQuery.of(context).size.width;
-    final itemSize = screenWidth * 0.5 + 16;
+    final itemSize = (screenWidth * 0.55) + 16;
     final index = (_scrollController.offset / itemSize).round();
     _currentIndex.value = index.clamp(0, widget.shopLists.length - 1);
   }
@@ -31,60 +32,101 @@ class _ShopListCarousselState extends State<ShopListCaroussel> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final buttonWidth = screenWidth * 0.5;
-    final buttonHeight = screenHeight * 0.20;
 
-    // Wenn keine Listen existieren dann nur einen Button mit "Liste erstellen"
+    // Quadratische Buttons
+    final double maxButtonWidth = screenWidth * 0.55;
+    const double minSize = 110;
+    const double maxSize = 180;
+    final double buttonSize = maxButtonWidth.clamp(minSize, maxSize);
+
+    final double carouselHeight = buttonSize + 32;
+
+    // Wenn keine Listen existieren
     if (widget.shopLists.isEmpty) {
-      return Center(
-        child: SizedBox(
-          width: buttonWidth,
-          height: buttonHeight,
-          child: ShopListButton(
-            title: 'Liste anlegen',
-            icon: Icons.add,
-            itemCount: 0,
-              onPressed: () async {
-                final result = await showDialog<(String, String)>(
-                  context: context,
-                  builder: (context) => const NewListDialog(),
-                );
-
-                if (result != null) {
-                  final (name, iconName) = result;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NewListScreen(
-                        listName: name,
-                        iconName: iconName,
-                      ),
-                    ),
-                  );
-                }
-              },          
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 24),
+          const Text(
+            "Deine Einkaufslisten...",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-        ),
+          ),
+          const SizedBox(height: 24),
+          Center(
+            child: SizedBox(
+              width: buttonSize,
+              height: buttonSize,
+              child: ShopListButton(
+                title: 'Liste anlegen',
+                icon: Icons.add,
+                itemCount: 0,
+                onPressed: () async {
+                  final result = await showDialog<(String, String)>(
+                    context: context,
+                    builder: (context) => const NewListDialog(),
+                  );
+
+                  if (result != null) {
+                    final (name, iconName) = result;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NewListScreen(
+                          listName: name,
+                          iconName: iconName,
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
       );
     }
 
-    // Wenn genau eine Liste existiert:
+    // Wenn genau eine Liste existiert
     if (widget.shopLists.length == 1) {
-      return Center(
-        child: SizedBox(
-          width: buttonWidth,
-          height: buttonHeight,
-          child: widget.shopLists.first,
-        ),
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            "Deine Einkaufslisten",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: SizedBox(
+              width: buttonSize,
+              height: buttonSize,
+              child: widget.shopLists.first,
+            ),
+          ),
+        ],
       );
     }
 
-    // Normales Karussell, wenn mehr als eine Liste vorhanden ist
-    final carouselHeight = buttonHeight + 32;
+    // Normales Karussell
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        const Text(
+          "Deine Einkaufslisten",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
         SizedBox(
           height: carouselHeight,
           child: ListView.separated(
@@ -98,15 +140,17 @@ class _ShopListCarousselState extends State<ShopListCaroussel> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: SizedBox(
-                  width: buttonWidth,
-                  height: buttonHeight,
+                  width: buttonSize,
+                  height: buttonSize,
                   child: widget.shopLists[index],
                 ),
               );
             },
           ),
         ),
+
         const SizedBox(height: 12),
+
         ValueListenableBuilder<int>(
           valueListenable: _currentIndex,
           builder: (context, value, _) {
@@ -129,92 +173,6 @@ class _ShopListCarousselState extends State<ShopListCaroussel> {
           },
         ),
       ],
-    );
-  }
-}
-
-// Das sind die großen Buttons im Karussell!
-class ShopListButton extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final int itemCount;
-  final VoidCallback onPressed;
-
-  const ShopListButton({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.itemCount,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 6,
-      borderRadius: BorderRadius.circular(16),
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(16),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFADD8E6), // Startfarbe
-                Color(0xFFF4F4F4), // Endfarbe
-              ],
-            ),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 40, color: Colors.black),
-                const SizedBox(height: 8),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(100, 0xFC, 0xFB, 0xFB),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.list_alt, size: 16, color: Colors.black),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$itemCount Gegenstände',
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

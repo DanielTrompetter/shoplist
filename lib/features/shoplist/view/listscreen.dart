@@ -184,7 +184,7 @@ class ListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const Slbottomnavbar(origin: Screen.homeScreen),
+      bottomNavigationBar: const Slbottomnavbar(origin: Screen.listScreen),
     );
   }
 }

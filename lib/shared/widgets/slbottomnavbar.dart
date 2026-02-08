@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shoplist/core/app_config.dart';
+import 'package:shoplist/data/models/fav_item.dart';
 import 'package:shoplist/data/models/shopping_item.dart';
 import 'package:shoplist/shared/widgets/edititempopup.dart';
+import 'package:shoplist/features/favorites/providers/favprovider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Slbottomnavbar extends StatelessWidget {
+class Slbottomnavbar extends ConsumerWidget {
   final Screen origin;
   final void Function(ShoppingItem)? onAddItem;
   final VoidCallback? onSaveList;
@@ -17,18 +20,19 @@ class Slbottomnavbar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final items = _buildItemsForOrigin(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = _buildItemsForOrigin(context, ref);
 
     return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.grey,
       unselectedItemColor: Colors.grey,
-      backgroundColor: const Color.fromARGB(255, 0xC3, 0xE7, 0xB5),
+      backgroundColor: const Color.fromARGB(255, 181, 194, 231),
       elevation: 10,
       items: items
           .map((e) => BottomNavigationBarItem(
                 icon: _buildIcon(e.icon),
-                label: '',
+                label: e.label,
               ))
           .toList(),
       onTap: (index) => items[index].onTap(),
@@ -63,52 +67,39 @@ class Slbottomnavbar extends StatelessWidget {
     );
   }
 
-  List<NavbarItem> _buildItemsForOrigin(BuildContext context) {
+  List<NavbarItem> _buildItemsForOrigin(BuildContext context, WidgetRef ref) {
     switch (origin) {
+
+      // ------------------------------------------------------------
+      // HOME SCREEN
+      // ------------------------------------------------------------
       case Screen.homeScreen:
         return [
           NavbarItem(
-            icon: const Icon(LucideIcons.info),
-            label: 'Info',
-            onTap: () => Navigator.pushNamed(context, '/infos'),
+            icon: const Icon(LucideIcons.star),
+            label: 'favorites',
+            onTap: () => Navigator.pushNamed(context, '/favscreen'),
           ),
           NavbarItem(
-            icon: const Icon(LucideIcons.user),
-            label: 'Profil',
-            onTap: () => Navigator.pushNamed(context, '/settings'),
+            icon: const Icon(LucideIcons.info),
+            label: 'info',
+            onTap: () => Navigator.pushNamed(context, '/infos'),
           ),
         ];
 
+      // ------------------------------------------------------------
+      // NORMAL LIST SCREEN
+      // ------------------------------------------------------------
       case Screen.listScreen:
         return [
           NavbarItem(
-            icon: const Icon(LucideIcons.home),
-            label: 'Info',
-            onTap: () => Navigator.pushNamed(context, '/infos'),
-          ),
-          NavbarItem(
-            icon: const Icon(LucideIcons.settings),
-            label: 'Einstellungen',
-            onTap: () => Navigator.pushNamed(context, '/profile'),
-          ),
-        ];
-
-      case Screen.newlist:
-        return [
-          NavbarItem(
-            icon: const Icon(LucideIcons.save),
-            label: 'Fertig',
-            onTap: () {
-              if (onSaveList != null) {
-                onSaveList!(); // 👈 Liste speichern
-              } else {
-                Navigator.pushNamed(context, '/home'); // Fallback
-              }
-            },
+            icon: const Icon(LucideIcons.star),
+            label: 'favorites',
+            onTap: () => Navigator.pushNamed(context, '/favscreen'),
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.plus),
-            label: 'Neuer Gegenstand',
+            label: 'add',
             onTap: () async {
               final newItem = await showModalBottomSheet<ShoppingItem>(
                 context: context,
@@ -123,9 +114,93 @@ class Slbottomnavbar extends StatelessWidget {
             },
           ),
           NavbarItem(
-            icon: const Icon(LucideIcons.settings),
-            label: 'Einstellungen',
-            onTap: () => Navigator.pushNamed(context, '/settings'),
+            icon: const Icon(LucideIcons.home),
+            label: 'home',
+            onTap: () => Navigator.pushNamed(context, '/home'),
+          ),
+        ];
+
+      // ------------------------------------------------------------
+      // NEW LIST SCREEN
+      // ------------------------------------------------------------
+      case Screen.newlist:
+        return [
+          NavbarItem(
+            icon: const Icon(LucideIcons.save),
+            label: 'save',
+            onTap: () {
+              if (onSaveList != null) {
+                onSaveList!();
+              } else {
+                Navigator.pushNamed(context, '/home');
+              }
+            },
+          ),
+          NavbarItem(
+            icon: const Icon(LucideIcons.plus),
+            label: 'add',
+            onTap: () async {
+              final newItem = await showModalBottomSheet<ShoppingItem>(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const EditItemPopup(item: null, newItem: false),
+              );
+
+              if (newItem != null && onAddItem != null) {
+                onAddItem!(newItem);
+              }
+            },
+          ),
+        ];
+
+      // ------------------------------------------------------------
+      // INFO SCREEN
+      // ------------------------------------------------------------
+      case Screen.info:
+        return [
+          NavbarItem(
+            icon: const Icon(LucideIcons.star),
+            label: 'favorites',
+            onTap: () => Navigator.pushNamed(context, '/favscreen'),
+          ),
+          NavbarItem(
+            icon: const Icon(LucideIcons.home),
+            label: 'home',
+            onTap: () => Navigator.pushNamed(context, '/home'),
+          ),
+        ];
+
+      // ------------------------------------------------------------
+      // FAVORITES SCREEN
+      // ------------------------------------------------------------
+      case Screen.favorites:
+        return [
+          NavbarItem(
+            icon: const Icon(LucideIcons.plus),
+            label: 'add',
+            onTap: () async {
+              final newItem = await showModalBottomSheet<ShoppingItem>(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const EditItemPopup(item: null, newItem: false),
+              );
+
+              if (newItem != null) {
+                ref.read(favoritesProvider.notifier).addFavorite(
+                  FavItem(
+                    name: newItem.name,
+                    category: newItem.category,
+                  ),
+                );
+              }
+            },
+          ),
+          NavbarItem(
+            icon: const Icon(LucideIcons.home),
+            label: 'home',
+            onTap: () => Navigator.pushNamed(context, '/home'),
           ),
         ];
     }

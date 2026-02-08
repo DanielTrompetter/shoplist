@@ -25,16 +25,20 @@ class NewListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingList = ref.watch(shoppingListProvider);
 
-    // Initialisierung verzögert nach dem ersten Frame
-    if (shoppingList.name.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(shoppingListProvider.notifier).initialize(
+    // 🔥 WICHTIG: Provider IMMER zurücksetzen + neu initialisieren
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notifier = ref.read(shoppingListProvider.notifier);
+
+      // Nur initialisieren, wenn der State noch NICHT gesetzt wurde
+      if (shoppingList.name != listName) {
+        notifier.reset();
+        notifier.initialize(
           name: listName,
           iconName: iconName,
           initialItems: const [],
         );
-      });
-    }
+      }
+    });
 
     final bodyContent = shoppingList.shoppingItems.isEmpty
         ? const Center(

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoplist/app.dart';
 import 'package:shoplist/core/app_config.dart';
 import 'package:shoplist/data/models/fav_item.dart';
 import 'package:shoplist/features/favorites/providers/favprovider.dart';
@@ -22,7 +23,7 @@ class FavScreen extends ConsumerWidget {
           elevation: 4,
         ),
         body: const Center(child: Text('Noch keine Favoriten')),
-        bottomNavigationBar: const Slbottomnavbar(origin: Screen.homeScreen),
+        bottomNavigationBar: const Slbottomnavbar(origin: Screen.favorites),
       );
     }
 
@@ -128,7 +129,17 @@ class FavScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const Slbottomnavbar(origin: Screen.homeScreen),
+      bottomNavigationBar: Slbottomnavbar(
+        origin: Screen.favorites,
+        onAddItem: (shoppingItem) {
+          ref.read(favoritesProvider.notifier).addFavorite(
+            FavItem(
+              name: shoppingItem.name,
+              category: shoppingItem.category,
+            ),
+          );
+        },
+      ),
     );
   }
 }

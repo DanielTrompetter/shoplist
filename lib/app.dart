@@ -18,7 +18,6 @@ import 'package:shoplist/features/favorites/view/favlistscreen.dart';
 import 'package:shoplist/features/home/view/homescreen.dart';
 import 'package:shoplist/features/info/view/infoscreen.dart';
 import 'package:shoplist/features/profile/view/profilescreen.dart';
-import 'package:shoplist/features/settings/view/settingsscreen.dart';
 import 'package:shoplist/features/shoplist/view/listscreen.dart';
 import 'package:shoplist/features/shoplist/view/newlistscreen.dart';
 
@@ -64,7 +63,6 @@ class App extends ConsumerWidget {
           '/favscreen': (context) => const FavScreen(),
           '/newlist': (context) => const NewListScreen(listName: '', iconName: ''),
           '/infos': (context) => const InfoScreen(),
-          '/settings': (context) => const SettingsScreen(),
           '/profile': (context) => const ProfileScreen(),
         },
         debugShowCheckedModeBanner: false,

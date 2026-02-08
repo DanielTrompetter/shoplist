@@ -10,5 +10,7 @@ enum Screen {
   homeScreen,
   listScreen,
   newlist,
+  info,
+  favorites
 }
 
