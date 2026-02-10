@@ -91,7 +91,7 @@ class Slbottomnavbar extends ConsumerWidget {
             ),
           ),
           NavbarItem(
-            icon: const Icon(LucideIcons.home),
+            icon: const Icon(LucideIcons.info),
             label: '',
             onTap: () => Navigator.pushNamed(context, '/infos'),
           ),
