@@ -1,10 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shoplist/app.dart';
 import 'package:shoplist/core/app_config.dart';
-import 'package:shoplist/data/models/fav_item.dart';
-import 'package:shoplist/features/favorites/providers/favprovider.dart';
+import 'package:shoplist/data/models/favItem.dart';
+import 'package:shoplist/data/models/shoppingItem.dart';
+import 'package:shoplist/shared/widgets/listbutton.dart';
+import 'package:shoplist/shared/widgets/edititempopup.dart';
+import 'package:shoplist/features/shoplist/providers/favprovider.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
 
 class FavScreen extends ConsumerWidget {
@@ -12,6 +14,13 @@ class FavScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ------------------------------------------------------------
+    // Argumente aus der Navigation holen
+    // ------------------------------------------------------------
+    final args = ModalRoute.of(context)?.settings.arguments as Map?;
+    final origin = args?['origin'] as Screen?;
+    final onAddItem = args?['onAddItem'] as void Function(ShoppingItem)?;
+
     final favorites = ref.watch(favoritesProvider);
 
     if (favorites.isEmpty) {
@@ -27,7 +36,9 @@ class FavScreen extends ConsumerWidget {
       );
     }
 
-    // Gruppiere Favoriten nach Kategorie
+    // ------------------------------------------------------------
+    // Favoriten nach Kategorie gruppieren
+    // ------------------------------------------------------------
     final Map<String, List<FavItem>> groupedItems = {};
     for (var item in favorites) {
       groupedItems.putIfAbsent(item.category, () => []).add(item);
@@ -67,22 +78,72 @@ class FavScreen extends ConsumerWidget {
               ),
             ),
             children: [
-              ...entry.value.map((item) {
-                return ListTile(
-                  title: Text(item.name),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      final index = favorites.indexOf(item);
+              ...entry.value.map((fav) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                  child: ListButton(
+                    item: fav.toShoppingItem(),
+                    isNewItem: false,
+                    isFavoriteMode: true,
+
+                    // ------------------------------------------------------------
+                    // Editieren eines Favoriten
+                    // ------------------------------------------------------------
+                    onEdit: () async {
+                      final editedShoppingItem =
+                          await showModalBottomSheet<ShoppingItem>(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => EditItemPopup(
+                          item: fav.toShoppingItem(),
+                          newItem: false,
+                        ),
+                      );
+
+                      if (editedShoppingItem != null) {
+                        final index = favorites.indexOf(fav);
+                        final updatedFav = FavItem.fromShoppingItem(editedShoppingItem);
+
+                        ref
+                            .read(favoritesProvider.notifier)
+                            .editFavorite(index, updatedFav);
+                      }
+                    },
+
+                    // ------------------------------------------------------------
+                    // Minus-Button (Favorit entfernen)
+                    // ------------------------------------------------------------
+                    onRemoveFavorite: () {
+                      final index = favorites.indexOf(fav);
                       ref.read(favoritesProvider.notifier).removeFavorite(index);
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('„${item.name}“ wurde entfernt'),
+                          content: Text('„${fav.name}“ wurde entfernt'),
                           duration: const Duration(seconds: 2),
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
                     },
+
+                    // ------------------------------------------------------------
+                    // Plus-Button: Item in die Liste einfügen
+                    // Nur sichtbar, wenn onAddItem != null
+                    // ------------------------------------------------------------
+                    onAddFavorite: onAddItem != null
+                        ? () {
+                            onAddItem!(fav.toShoppingItem());
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('„${fav.name}“ zur Liste hinzugefügt'),
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        : null,
                   ),
                 );
               }),
@@ -129,16 +190,12 @@ class FavScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: Slbottomnavbar(
+
+      // ------------------------------------------------------------
+      // BottomNavBar: origin bleibt favorites
+      // ------------------------------------------------------------
+      bottomNavigationBar: const Slbottomnavbar(
         origin: Screen.favorites,
-        onAddItem: (shoppingItem) {
-          ref.read(favoritesProvider.notifier).addFavorite(
-            FavItem(
-              name: shoppingItem.name,
-              category: shoppingItem.category,
-            ),
-          );
-        },
       ),
     );
   }

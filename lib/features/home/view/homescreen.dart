@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoplist/core/app_config.dart';
-import 'package:shoplist/data/models/shopping_list.dart';
+import 'package:shoplist/data/models/shoppingList.dart';
 import 'package:shoplist/data/repositories/dbinterface.dart';
 import 'package:shoplist/app.dart';
 import 'package:shoplist/features/home/widgets/carousellbutton.dart';
@@ -10,24 +10,15 @@ import 'package:shoplist/features/home/widgets/centerrectandlogo.dart';
 import 'package:shoplist/features/home/widgets/shoplistcarousell.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  late Future<List<ShoppingList>> shoppingLists;
-
-  @override
-  void initState() {
-    super.initState();
-    shoppingLists = ref.read(dbProvider.future).then((db) => db.loadLists());
+  Future<List<ShoppingList>> _loadLists(WidgetRef ref) {
+    return ref.read(dbProvider.future).then((db) => db.loadLists());
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFE6F4EA),
       appBar: AppBar(
@@ -56,13 +47,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     SizedBox(height: height * 0.03),
 
-                    // Header (Bild + Button)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: CenterRect(screenWidth: width),
                     ),
 
-                    // Separator
                     const SizedBox(height: 4),
                     Divider(
                       thickness: 1.2,
@@ -72,10 +61,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     const SizedBox(height: 4),
 
-                    // Karussell bekommt jetzt dynamischen Platz
                     Expanded(
                       child: FutureBuilder<List<ShoppingList>>(
-                        future: shoppingLists,
+                        future: _loadLists(ref),   // ⭐ FIX: immer frisch laden
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const Center(
@@ -92,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 Navigator.pushNamed(
                                   context,
                                   '/listscreen',
-                                  arguments: list,
+                                  arguments: list.name,
                                 );
                               },
                             );

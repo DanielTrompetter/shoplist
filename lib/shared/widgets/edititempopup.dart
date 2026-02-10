@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/data/models/shoppingItem.dart';
 import 'package:shoplist/data/repositories/dbinterface.dart';
 import 'package:shoplist/shared/widgets/categorycarousselitem.dart';
 import 'package:shoplist/shared/widgets/smallbutton.dart';
@@ -91,7 +91,7 @@ class _EditItemPopupState extends State<EditItemPopup> {
                         theIcon: const Icon(Icons.check),
                         onTap: () {
                         final name = nameController.text.trim();
-                        final amount = int.tryParse(amountController.text) ?? 1;
+                        final amount = double.tryParse(amountController.text) ?? 1;
 
                           if (name.isNotEmpty) {
                             final item = ShoppingItem(

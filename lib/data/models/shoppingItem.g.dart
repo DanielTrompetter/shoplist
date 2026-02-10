@@ -1,38 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'fav_item.dart';
+part of 'shoppingItem.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class FavItemAdapter extends TypeAdapter<FavItem> {
+class ShoppingItemAdapter extends TypeAdapter<ShoppingItem> {
   @override
-  final int typeId = 2;
+  final int typeId = 0;
 
   @override
-  FavItem read(BinaryReader reader) {
+  ShoppingItem read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return FavItem(
+    return ShoppingItem(
       name: fields[0] as String,
       category: fields[1] as String,
-      iconName: fields[2] as String,
+      amount: fields[2] as double,
+      shopped: fields[3] as bool,
     );
   }
 
   @override
-  void write(BinaryWriter writer, FavItem obj) {
+  void write(BinaryWriter writer, ShoppingItem obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
       ..write(obj.category)
       ..writeByte(2)
-      ..write(obj.iconName);
+      ..write(obj.amount)
+      ..writeByte(3)
+      ..write(obj.shopped);
   }
 
   @override
@@ -41,7 +44,7 @@ class FavItemAdapter extends TypeAdapter<FavItem> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is FavItemAdapter &&
+      other is ShoppingItemAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

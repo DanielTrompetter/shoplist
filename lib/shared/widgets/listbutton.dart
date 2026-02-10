@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/data/models/shoppingItem.dart';
 import 'package:shoplist/shared/widgets/squarebutton.dart';
 
 class ListButton extends StatelessWidget {
   final ShoppingItem item;
   final bool isNewItem;
+
+  // Favoriten-Modus
+  final bool isFavoriteMode;
+
+  // Aktionen
   final VoidCallback? onEdit;
   final VoidCallback? onToggleShopped;
+  final VoidCallback? onAddFavorite;     // Plus
+  final VoidCallback? onRemoveFavorite;  // Minus
 
   const ListButton({
     super.key,
     required this.item,
     required this.isNewItem,
+    required this.isFavoriteMode,
     this.onEdit,
     this.onToggleShopped,
+    this.onAddFavorite,
+    this.onRemoveFavorite,
   });
 
   @override
@@ -22,7 +32,24 @@ class ListButton extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Hauptbutton mit Gradient
+          // ------------------------------------------------------------
+          // FAVORITEN-MODUS: Minus-Button links
+          // ------------------------------------------------------------
+          if (isFavoriteMode)
+            SizedBox(
+              width: 56,
+              child: SquareButton(
+                mode: SquareButtonMode.favRemove,
+                isShopped: false,
+                onPressed: onRemoveFavorite,
+              ),
+            ),
+
+          if (isFavoriteMode) const SizedBox(width: 8),
+
+          // ------------------------------------------------------------
+          // Hauptbutton
+          // ------------------------------------------------------------
           Expanded(
             child: Material(
               borderRadius: BorderRadius.circular(16),
@@ -54,12 +81,25 @@ class ListButton extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   onTap: onEdit,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(item.name, style: const TextStyle(fontSize: 24, color: Colors.black87)),
-                        Text('x${item.amount}', style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black87)),
+                        Text(
+                          item.name,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          'x${item.amount}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -70,14 +110,31 @@ class ListButton extends StatelessWidget {
 
           const SizedBox(width: 8),
 
-          // Quadratischer Switch-Button, gekauft oder x für kann weg! xD
-          SizedBox(
-            width: 56,
-            child: SquareButton(
-              isShopped: isNewItem || item.shopped,
-              onPressed: onToggleShopped,
+          // ------------------------------------------------------------
+          // Rechts: Plus NUR wenn erlaubt
+          // ------------------------------------------------------------
+          if (isFavoriteMode && onAddFavorite != null)
+            SizedBox(
+              width: 56,
+              child: SquareButton(
+                mode: SquareButtonMode.favAdd,
+                isShopped: false,
+                onPressed: onAddFavorite,
+              ),
             ),
-          ),
+
+          // ------------------------------------------------------------
+          // Normaler Listenmodus
+          // ------------------------------------------------------------
+          if (!isFavoriteMode)
+            SizedBox(
+              width: 56,
+              child: SquareButton(
+                mode: SquareButtonMode.list,
+                isShopped: isNewItem || item.shopped,
+                onPressed: onToggleShopped,
+              ),
+            ),
         ],
       ),
     );

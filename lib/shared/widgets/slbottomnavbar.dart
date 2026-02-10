@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shoplist/core/app_config.dart';
-import 'package:shoplist/data/models/fav_item.dart';
-import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/data/models/favItem.dart';
+import 'package:shoplist/data/models/shoppingItem.dart';
 import 'package:shoplist/shared/widgets/edititempopup.dart';
-import 'package:shoplist/features/favorites/providers/favprovider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shoplist/features/shoplist/providers/favprovider.dart';
 
 class Slbottomnavbar extends ConsumerWidget {
   final Screen origin;
   final void Function(ShoppingItem)? onAddItem;
   final VoidCallback? onSaveList;
+  final VoidCallback? onDeleteList;
 
   const Slbottomnavbar({
     super.key,
     required this.origin,
     this.onAddItem,
     this.onSaveList,
+    this.onDeleteList,
   });
 
   @override
@@ -24,6 +26,7 @@ class Slbottomnavbar extends ConsumerWidget {
     final items = _buildItemsForOrigin(context, ref);
 
     return BottomNavigationBar(
+      currentIndex: 0,
       type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.grey,
       unselectedItemColor: Colors.grey,
@@ -78,24 +81,38 @@ class Slbottomnavbar extends ConsumerWidget {
           NavbarItem(
             icon: const Icon(LucideIcons.star),
             label: 'favorites',
-            onTap: () => Navigator.pushNamed(context, '/favscreen'),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/favscreen',
+              arguments: {
+                'origin': origin,
+                'onAddItem': null, // HomeScreen → kein kleiner Plusbutton
+              },
+            ),
           ),
           NavbarItem(
-            icon: const Icon(LucideIcons.info),
-            label: 'info',
-            onTap: () => Navigator.pushNamed(context, '/infos'),
+            icon: const Icon(LucideIcons.home),
+            label: 'home',
+            onTap: () => Navigator.pushNamed(context, '/home'),
           ),
         ];
 
       // ------------------------------------------------------------
-      // NORMAL LIST SCREEN
+      // LIST SCREEN
       // ------------------------------------------------------------
       case Screen.listScreen:
         return [
           NavbarItem(
             icon: const Icon(LucideIcons.star),
             label: 'favorites',
-            onTap: () => Navigator.pushNamed(context, '/favscreen'),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/favscreen',
+              arguments: {
+                'origin': origin,
+                'onAddItem': onAddItem, // wichtig!
+              },
+            ),
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.plus),
@@ -114,9 +131,15 @@ class Slbottomnavbar extends ConsumerWidget {
             },
           ),
           NavbarItem(
-            icon: const Icon(LucideIcons.home),
-            label: 'home',
-            onTap: () => Navigator.pushNamed(context, '/home'),
+            icon: const Icon(LucideIcons.trash),
+            label: 'delete',
+            onTap: () {
+              if (onDeleteList != null) {
+                onDeleteList!();
+              } else {
+                Navigator.pushNamed(context, '/home');
+              }
+            },
           ),
         ];
 
@@ -152,22 +175,17 @@ class Slbottomnavbar extends ConsumerWidget {
               }
             },
           ),
-        ];
-
-      // ------------------------------------------------------------
-      // INFO SCREEN
-      // ------------------------------------------------------------
-      case Screen.info:
-        return [
           NavbarItem(
             icon: const Icon(LucideIcons.star),
             label: 'favorites',
-            onTap: () => Navigator.pushNamed(context, '/favscreen'),
-          ),
-          NavbarItem(
-            icon: const Icon(LucideIcons.home),
-            label: 'home',
-            onTap: () => Navigator.pushNamed(context, '/home'),
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/favscreen',
+              arguments: {
+                'origin': origin,
+                'onAddItem': onAddItem, // wichtig!
+              },
+            ),
           ),
         ];
 
@@ -176,6 +194,7 @@ class Slbottomnavbar extends ConsumerWidget {
       // ------------------------------------------------------------
       case Screen.favorites:
         return [
+          // Add Favorite
           NavbarItem(
             icon: const Icon(LucideIcons.plus),
             label: 'add',
@@ -197,6 +216,17 @@ class Slbottomnavbar extends ConsumerWidget {
               }
             },
           ),
+
+          // Home (zweiter Button → verhindert Crash)
+          NavbarItem(
+            icon: const Icon(LucideIcons.home),
+            label: 'home',
+            onTap: () => Navigator.pushNamed(context, '/home'),
+          ),
+        ];
+
+      default:
+        return [
           NavbarItem(
             icon: const Icon(LucideIcons.home),
             label: 'home',

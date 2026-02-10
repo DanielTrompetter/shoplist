@@ -2,14 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:hive/hive.dart';
 
-// Firebase deaktiviert!
-/*
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-*/
-
-import 'package:shoplist/data/models/shopping_list.dart';
-import 'package:shoplist/data/models/fav_item.dart';
+import 'package:shoplist/data/models/shoppingList.dart';
+import 'package:shoplist/data/models/favItem.dart';
 
 class ListTypeManager {
   static final Map<String, IconData> iconMap = {
@@ -37,100 +31,26 @@ class CategoryManager {
       categoryIcons[category] ?? LucideIcons.helpCircle;
 }
 
-/// DbInterface – aktuell nur Hive, Firestore deaktiviert
+/// DbInterface – aktuell nur Hive
 class DbInterface {
   final Box<ShoppingList> hiveBox;
-  final Box<FavItem> favoritesBox;
-
-  // prefsBox & firestore deaktiviert:
-  /*
-  final Box prefsBox;
-  final FirebaseFirestore? firestore;
-  */
 
   DbInterface._({
     required this.hiveBox,
-    required this.favoritesBox,
-    /*
-    required this.prefsBox,
-    required this.firestore,
-    */
   });
 
   /// Factory für Riverpod FutureProvider
   static Future<DbInterface> create() async {
-    final hiveBox = await Hive.openBox<ShoppingList>('shoppingLists');
-    final favoritesBox = await Hive.openBox<FavItem>('favorites');
+    // ✔ Favoriten-Box öffnen
+    await Hive.openBox<FavItem>('favorites');
 
-    /*
-    final prefsBox = await Hive.openBox('prefs');
-    */
+    // ✔ ShoppingLists-Box öffnen
+    final hiveBox = await Hive.openBox<ShoppingList>('shoppingLists');
 
     return DbInterface._(
       hiveBox: hiveBox,
-      favoritesBox: favoritesBox,
-      /*
-      prefsBox: prefsBox,
-      firestore: firestore,
-      */
     );
   }
-
-  // --- Favoriten-Handling ---
-  Future<List<FavItem>> getFavorites() async =>
-      favoritesBox.values.toList();
-
-  Future<void> saveToFavorites(FavItem item) async =>
-      favoritesBox.put(item.name, item);
-
-  Future<void> removeFromFavorites(String name) async =>
-      favoritesBox.delete(name);
-
-  // --- User-Handling (Firebase deaktiviert) ---
-  /*
-  Future<void> registerUser(String email, String password) async {
-    final auth = FirebaseAuth.instance;
-    final userCredential = await auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    final uid = userCredential.user!.uid;
-    final collection = kReleaseMode ? 'users_prod' : 'users_dev';
-
-    await firestore?.collection(collection).doc(uid).set({
-      'email': email,
-      'createdAt': FieldValue.serverTimestamp(),
-      'lastLogin': FieldValue.serverTimestamp(),
-    });
-
-    await prefsBox.put('userEmail', email);
-    await prefsBox.put('isLoggedIn', true);
-  }
-
-  Future<void> loginUser(String email, String password) async {
-    final auth = FirebaseAuth.instance;
-    final userCredential = await auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    final uid = userCredential.user!.uid;
-    final collection = kReleaseMode ? 'users_prod' : 'users_dev';
-
-    await firestore?.collection(collection).doc(uid).update({
-      'lastLogin': FieldValue.serverTimestamp(),
-    });
-
-    await prefsBox.put('userEmail', email);
-    await prefsBox.put('isLoggedIn', true);
-  }
-
-  Future<void> logoutUser() async {
-    await FirebaseAuth.instance.signOut();
-    await prefsBox.clear();
-  }
-  */
 
   // --- ShoppingLists ---
   Future<List<ShoppingList>> loadLists() async =>
@@ -138,23 +58,9 @@ class DbInterface {
 
   Future<void> saveList(ShoppingList list) async {
     await hiveBox.put(list.name, list);
-
-    /*
-    if (firestore != null) {
-      final data = list.toMap();
-      data['env'] = kReleaseMode ? 'prod' : 'dev';
-      await firestore!.collection('shoppingLists').doc(list.name).set(data);
-    }
-    */
   }
 
   Future<void> deleteList(String name) async {
     await hiveBox.delete(name);
-
-    /*
-    if (firestore != null) {
-      await firestore!.collection('shoppingLists').doc(name).delete();
-    }
-    */
   }
 }

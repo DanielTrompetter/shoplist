@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:shoplist/data/models/fav_item.dart';
+import 'package:shoplist/data/models/favItem.dart';
 
 final favoritesProvider =
     NotifierProvider<FavoritesNotifier, List<FavItem>>(FavoritesNotifier.new);
@@ -15,12 +15,17 @@ class FavoritesNotifier extends Notifier<List<FavItem>> {
   }
 
   void addFavorite(FavItem item) {
-    box.add(item);
+    box.add(item); // ✔ int-Key, konsistent
+    state = box.values.toList();
+  }
+
+  void editFavorite(int index, FavItem updated) {
+    box.putAt(index, updated); // ✔ int-Key bleibt int-Key
     state = box.values.toList();
   }
 
   void removeFavorite(int index) {
-    box.deleteAt(index);
+    box.deleteAt(index); // ✔ int-Key löschen
     state = box.values.toList();
   }
 }

@@ -2,12 +2,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoplist/core/app_config.dart';
-import 'package:shoplist/data/models/shopping_item.dart';
-import 'package:shoplist/data/models/shopping_list.dart';
+import 'package:shoplist/data/models/shoppingItem.dart';
+import 'package:shoplist/data/models/shoppingList.dart';
+import 'package:shoplist/data/repositories/dbProvider.dart';
 import 'package:shoplist/shared/widgets/listbutton.dart';
 import 'package:shoplist/shared/widgets/edititempopup.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
-import 'package:shoplist/features/shoplist/providers/list_provider.dart'; // <- wichtig!
+import 'package:shoplist/features/shoplist/providers/shoppingListprovider.dart';
 
 class ListScreen extends ConsumerWidget {
   const ListScreen({super.key});
@@ -15,39 +16,31 @@ class ListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is! ShoppingList) {
+
+    if (args is! String) {
       return const Scaffold(
-        body: Center(child: Text('ALARM! Keine ShoppingList übergeben!')),
+        body: Center(child: Text('Keine Listen-ID übergeben!')),
       );
     }
 
-    final shoppingList = ref.watch(shoppingListProvider);
+    final listName = args;
+    final allLists = ref.watch(shoppingListProvider);
 
-    // Initialisierung verzögert nach dem ersten Frame
+    // passende Liste finden
+    final shoppingList =
+        allLists.firstWhere((l) => l.name == listName, orElse: () => ShoppingList.empty());
+
     if (shoppingList.name.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(shoppingListProvider.notifier).initialize(
-          name: args.name,
-          iconName: args.iconName,
-          initialItems: args.shoppingItems,
-        );
-      });
-    }
-
-    if (shoppingList.shoppingItems.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(shoppingList.name.isEmpty ? args.name : shoppingList.name),
+          title: Text(listName),
           centerTitle: true,
-          backgroundColor: Colors.white,
-          elevation: 4,
         ),
-        body: const Center(child: Text('Diese Liste ist leer')),
-        bottomNavigationBar: const Slbottomnavbar(origin: Screen.homeScreen),
+        body: const Center(child: Text('Liste nicht gefunden')),
       );
     }
 
-    // Gruppiere Items nach Kategorie
+    // Gruppieren nach Kategorie
     final Map<String, List<ShoppingItem>> groupedItems = {};
     for (var item in shoppingList.shoppingItems) {
       groupedItems.putIfAbsent(item.category, () => []).add(item);
@@ -65,85 +58,67 @@ class ListScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(20),
+              color: Colors.black26,
               blurRadius: 6,
-              offset: const Offset(0, 3),
+              offset: Offset(0, 3),
             ),
           ],
         ),
-        child: Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            initiallyExpanded: true,
-            title: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Text(
-                entry.key,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
+        child: ExpansionTile(
+          initiallyExpanded: true,
+          title: Text(
+            entry.key,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            children: [
-              ...entry.value.map((item) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                  child: ListButton(
-                    item: item,
-                    isNewItem: false,
-                    onEdit: () async {
-                      final editedItem = await showModalBottomSheet<ShoppingItem>(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (_) => EditItemPopup(item: item, newItem: false),
-                      );
-                      if (editedItem != null) {
-                        final index = shoppingList.shoppingItems.indexOf(item);
-                        ref.read(shoppingListProvider.notifier).editItem(index, editedItem);
-                      }
-                    },
-                    onToggleShopped: () {
-                      if (item.shopped) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Eintrag löschen'),
-                            content: Text('Wirklich „${item.name}“ löschen?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Abbrechen'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  ref.read(shoppingListProvider.notifier).removeItem(item);
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('„${item.name}“ wurde entfernt'),
-                                      duration: const Duration(seconds: 2),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                },
-                                child: const Text('Ja'),
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        ref.read(shoppingListProvider.notifier).toggleShopped(item);
-                      }
-                    },
-                  ),
-                );
-              }),
-              const SizedBox(height: 8),
-            ],
           ),
+          children: [
+            ...entry.value.map((item) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                child: ListButton(
+                  item: item,
+                  isNewItem: false,
+                  isFavoriteMode: false,
+                  onEdit: () async {
+                    final editedItem = await showModalBottomSheet<ShoppingItem>(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => EditItemPopup(item: item, newItem: false),
+                    );
+
+                    if (editedItem != null) {
+                      final updatedItems = [...shoppingList.shoppingItems];
+                      final index = updatedItems.indexOf(item);
+                      updatedItems[index] = editedItem;
+
+                      final updatedList = shoppingList.copyWith(
+                        shoppingItems: updatedItems,
+                      );
+
+                      ref.read(shoppingListProvider.notifier)
+                          .updateList(shoppingList.name, updatedList);
+                    }
+                  },
+                  onToggleShopped: () {
+                    final updatedItems = [...shoppingList.shoppingItems];
+                    final index = updatedItems.indexOf(item);
+                    updatedItems[index] = item.copyWith(shopped: !item.shopped);
+
+                    final updatedList = shoppingList.copyWith(
+                      shoppingItems: updatedItems,
+                    );
+
+                    ref.read(shoppingListProvider.notifier)
+                        .updateList(shoppingList.name, updatedList);
+                  },
+                ),
+              );
+            }),
+            const SizedBox(height: 8),
+          ],
         ),
       );
     }).toList();
@@ -184,7 +159,36 @@ class ListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const Slbottomnavbar(origin: Screen.listScreen),
+      bottomNavigationBar: Slbottomnavbar(
+        origin: Screen.listScreen,
+        onDeleteList: () async {
+          final confirm = await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Liste löschen?"),
+                content: const Text("Willst du diese Liste wirklich löschen?"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text("Abbrechen"),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text("Löschen!"),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (confirm == true) {
+            final db = await ref.read(dbProvider.future);
+            await db.deleteList(shoppingList.name);
+            Navigator.pop(context, true); // HomeScreen refresht
+          }
+        }
+      ),
     );
   }
 }

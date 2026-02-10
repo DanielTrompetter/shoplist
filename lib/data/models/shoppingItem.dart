@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-part 'shopping_item.g.dart';
+part 'shoppingItem.g.dart';
 
 @HiveType(typeId: 0)
 class ShoppingItem {
@@ -11,7 +11,7 @@ class ShoppingItem {
   final String category;
 
   @HiveField(2)
-  final int amount;
+  final double amount;
 
   @HiveField(3)
   final bool shopped;
@@ -27,7 +27,7 @@ class ShoppingItem {
   ShoppingItem copyWith({
     String? name,
     String? category,
-    int? amount,
+    double? amount,
     bool? shopped,
   }) {
     return ShoppingItem(

@@ -2,11 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoplist/core/app_config.dart';
-import 'package:shoplist/data/models/shopping_item.dart';
-import 'package:shoplist/data/models/shopping_list.dart';
+import 'package:shoplist/data/models/shoppingItem.dart';
+import 'package:shoplist/data/models/shoppingList.dart';
 import 'package:shoplist/data/repositories/dbinterface.dart';
-import 'package:shoplist/app.dart';
-import 'package:shoplist/features/shoplist/providers/list_provider.dart';
+import 'package:shoplist/features/shoplist/providers/newListProvider.dart';
 import 'package:shoplist/shared/widgets/listbutton.dart';
 import 'package:shoplist/shared/widgets/edititempopup.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
@@ -23,24 +22,24 @@ class NewListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final shoppingList = ref.watch(shoppingListProvider);
+    final newList = ref.watch(newListProvider);
 
-    // 🔥 WICHTIG: Provider IMMER zurücksetzen + neu initialisieren
+    // Liste nur EINMAL initialisieren
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final notifier = ref.read(shoppingListProvider.notifier);
+      final notifier = ref.read(newListProvider.notifier);
 
-      // Nur initialisieren, wenn der State noch NICHT gesetzt wurde
-      if (shoppingList.name != listName) {
-        notifier.reset();
-        notifier.initialize(
-          name: listName,
-          iconName: iconName,
-          initialItems: const [],
-        );
+      if (newList == null && !notifier.initialized) {
+        notifier.startNewList(listName, iconName);
       }
     });
 
-    final bodyContent = shoppingList.shoppingItems.isEmpty
+    if (newList == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final bodyContent = newList.shoppingItems.isEmpty
         ? const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +62,7 @@ class NewListScreen extends ConsumerWidget {
           )
         : ListView(
             padding: const EdgeInsets.all(16),
-            children: _buildCategoryWidgets(context, ref, shoppingList),
+            children: _buildCategoryWidgets(context, ref, newList),
           );
 
     return Scaffold(
@@ -73,12 +72,12 @@ class NewListScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              ListTypeManager.iconMap[shoppingList.iconName] ?? Icons.help_outline,
+              ListTypeManager.iconMap[newList.iconName] ?? Icons.help_outline,
               color: Colors.black87,
             ),
             const SizedBox(width: 8),
             Text(
-              shoppingList.name,
+              newList.name,
               style: const TextStyle(color: Colors.black87),
             ),
           ],
@@ -87,6 +86,8 @@ class NewListScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 4,
       ),
+
+
       body: Stack(
         children: [
           Positioned.fill(child: Image.asset('assets/Neutral.png', fit: BoxFit.cover)),
@@ -110,26 +111,24 @@ class NewListScreen extends ConsumerWidget {
           SafeArea(child: bodyContent),
         ],
       ),
+
       bottomNavigationBar: Slbottomnavbar(
         origin: Screen.newlist,
         onAddItem: (item) {
-          ref.read(shoppingListProvider.notifier).addItem(item);
+          ref.read(newListProvider.notifier).addItem(item);
         },
         onSaveList: () async {
-          if (shoppingList.shoppingItems.isNotEmpty) {
-            final db = await ref.read(dbProvider.future);
-            await db.saveList(shoppingList);
-          }
-          Navigator.pushNamed(context, '/home');
+          await ref.read(newListProvider.notifier).saveList();
+          Navigator.pop(context, true); // HomeScreen kann refreshen
         },
       ),
     );
   }
 
   List<Widget> _buildCategoryWidgets(
-      BuildContext context, WidgetRef ref, ShoppingList shoppingList) {
+      BuildContext context, WidgetRef ref, ShoppingList newList) {
     final groupedItems = <String, List<ShoppingItem>>{};
-    for (var item in shoppingList.shoppingItems) {
+    for (var item in newList.shoppingItems) {
       groupedItems.putIfAbsent(item.category, () => []).add(item);
     }
 
@@ -146,6 +145,7 @@ class NewListScreen extends ConsumerWidget {
           child: ListButton(
             item: item,
             isNewItem: true,
+            isFavoriteMode: false,
             onEdit: () async {
               final editedItem = await showModalBottomSheet<ShoppingItem>(
                 context: context,
@@ -154,12 +154,13 @@ class NewListScreen extends ConsumerWidget {
                 builder: (_) => EditItemPopup(item: item, newItem: true),
               );
               if (editedItem != null) {
-                final index = shoppingList.shoppingItems.indexOf(item);
-                ref.read(shoppingListProvider.notifier).editItem(index, editedItem);
+                final index = newList.shoppingItems.indexOf(item);
+                ref.read(newListProvider.notifier).updateItem(index, editedItem);
               }
             },
             onToggleShopped: () {
-              ref.read(shoppingListProvider.notifier).removeItem(item);
+              final index = newList.shoppingItems.indexOf(item);
+              ref.read(newListProvider.notifier).removeItem(index);
             },
           ),
         );

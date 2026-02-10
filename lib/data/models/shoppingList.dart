@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
-import 'package:shoplist/data/models/shopping_item.dart';
+import 'package:shoplist/data/models/shoppingItem.dart';
 
-part 'shopping_list.g.dart';
+part 'shoppingList.g.dart';
 
 @HiveType(typeId: 1)
 class ShoppingList {
@@ -19,6 +19,15 @@ class ShoppingList {
     required this.iconName,
     required this.shoppingItems,
   });
+
+  // ⭐ GENAU DAS HAT DIR GEFELT: EMPTY
+  factory ShoppingList.empty() {
+    return ShoppingList(
+      name: '',
+      iconName: '',
+      shoppingItems: const [],
+    );
+  }
 
   /// Hilfsmethode für Riverpod-State-Updates
   ShoppingList copyWith({
