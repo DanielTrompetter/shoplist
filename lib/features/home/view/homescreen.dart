@@ -3,22 +3,24 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoplist/core/app_config.dart';
 import 'package:shoplist/data/models/shoppingList.dart';
-import 'package:shoplist/data/repositories/dbinterface.dart';
 import 'package:shoplist/app.dart';
+import 'package:shoplist/data/repositories/dbinterface.dart';
 import 'package:shoplist/features/home/widgets/carousellbutton.dart';
 import 'package:shoplist/features/home/widgets/centerrectandlogo.dart';
 import 'package:shoplist/features/home/widgets/shoplistcarousell.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
+import 'package:shoplist/features/shoplist/providers/shoppingListprovider.dart';
+import 'package:shoplist/shared/widgets/newlistdialog.dart';
+import 'package:shoplist/features/shoplist/view/newlistscreen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  Future<List<ShoppingList>> _loadLists(WidgetRef ref) {
-    return ref.read(dbProvider.future).then((db) => db.loadLists());
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ⭐ Provider ist jetzt die einzige Quelle für Listen
+    final shoppingLists = ref.watch(shoppingListProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFE6F4EA),
       appBar: AppBar(
@@ -42,6 +44,22 @@ class HomeScreen extends ConsumerWidget {
               final width = constraints.maxWidth;
               final height = constraints.maxHeight;
 
+              // ⭐ Buttons aus Provider-Daten erzeugen
+              final shopListButtons = shoppingLists.map((list) {
+                return ShopListButton(
+                  title: list.name,
+                  icon: ListTypeManager.getIcon(list.iconName),
+                  itemCount: list.shoppingItems.length,
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/listscreen',
+                      arguments: list.name, // ⭐ WICHTIG: Name als String
+                    );
+                  },
+                );
+              }).toList();
+
               return SafeArea(
                 child: Column(
                   children: [
@@ -62,32 +80,8 @@ class HomeScreen extends ConsumerWidget {
                     const SizedBox(height: 4),
 
                     Expanded(
-                      child: FutureBuilder<List<ShoppingList>>(
-                        future: _loadLists(ref),   // ⭐ FIX: immer frisch laden
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-
-                          final shoppingLists = snapshot.data!;
-                          final shopListButtons = shoppingLists.map((list) {
-                            return ShopListButton(
-                              title: list.name,
-                              icon: ListTypeManager.getIcon(list.iconName),
-                              itemCount: list.shoppingItems.length,
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/listscreen',
-                                  arguments: list.name,
-                                );
-                              },
-                            );
-                          }).toList();
-
-                          return ShopListCaroussel(shopLists: shopListButtons);
-                        },
+                      child: ShopListCaroussel(
+                        shopLists: shopListButtons,
                       ),
                     ),
                   ],
@@ -97,7 +91,10 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const Slbottomnavbar(origin: Screen.homeScreen),
+
+      bottomNavigationBar: const Slbottomnavbar(
+        origin: Screen.homeScreen,
+      ),
     );
   }
 }

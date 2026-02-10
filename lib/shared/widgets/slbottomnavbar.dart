@@ -80,7 +80,7 @@ class Slbottomnavbar extends ConsumerWidget {
         return [
           NavbarItem(
             icon: const Icon(LucideIcons.star),
-            label: 'favorites',
+            label: '',
             onTap: () => Navigator.pushNamed(
               context,
               '/favscreen',
@@ -92,8 +92,8 @@ class Slbottomnavbar extends ConsumerWidget {
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.home),
-            label: 'home',
-            onTap: () => Navigator.pushNamed(context, '/home'),
+            label: '',
+            onTap: () => Navigator.pushNamed(context, '/infos'),
           ),
         ];
 
@@ -104,7 +104,7 @@ class Slbottomnavbar extends ConsumerWidget {
         return [
           NavbarItem(
             icon: const Icon(LucideIcons.star),
-            label: 'favorites',
+            label: '',
             onTap: () => Navigator.pushNamed(
               context,
               '/favscreen',
@@ -116,7 +116,7 @@ class Slbottomnavbar extends ConsumerWidget {
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.plus),
-            label: 'add',
+            label: '',
             onTap: () async {
               final newItem = await showModalBottomSheet<ShoppingItem>(
                 context: context,
@@ -132,7 +132,7 @@ class Slbottomnavbar extends ConsumerWidget {
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.trash),
-            label: 'delete',
+            label: '',
             onTap: () {
               if (onDeleteList != null) {
                 onDeleteList!();
@@ -150,7 +150,7 @@ class Slbottomnavbar extends ConsumerWidget {
         return [
           NavbarItem(
             icon: const Icon(LucideIcons.save),
-            label: 'save',
+            label: '',
             onTap: () {
               if (onSaveList != null) {
                 onSaveList!();
@@ -161,7 +161,7 @@ class Slbottomnavbar extends ConsumerWidget {
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.plus),
-            label: 'add',
+            label: '',
             onTap: () async {
               final newItem = await showModalBottomSheet<ShoppingItem>(
                 context: context,
@@ -177,7 +177,7 @@ class Slbottomnavbar extends ConsumerWidget {
           ),
           NavbarItem(
             icon: const Icon(LucideIcons.star),
-            label: 'favorites',
+            label: '',
             onTap: () => Navigator.pushNamed(
               context,
               '/favscreen',
@@ -197,7 +197,7 @@ class Slbottomnavbar extends ConsumerWidget {
           // Add Favorite
           NavbarItem(
             icon: const Icon(LucideIcons.plus),
-            label: 'add',
+            label: '',
             onTap: () async {
               final newItem = await showModalBottomSheet<ShoppingItem>(
                 context: context,
@@ -220,7 +220,7 @@ class Slbottomnavbar extends ConsumerWidget {
           // Home (zweiter Button → verhindert Crash)
           NavbarItem(
             icon: const Icon(LucideIcons.home),
-            label: 'home',
+            label: '',
             onTap: () => Navigator.pushNamed(context, '/home'),
           ),
         ];
@@ -229,7 +229,7 @@ class Slbottomnavbar extends ConsumerWidget {
         return [
           NavbarItem(
             icon: const Icon(LucideIcons.home),
-            label: 'home',
+            label: '',
             onTap: () => Navigator.pushNamed(context, '/home'),
           ),
         ];

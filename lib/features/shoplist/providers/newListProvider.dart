@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoplist/data/models/shoppingItem.dart';
 import 'package:shoplist/data/models/shoppingList.dart';
-import 'package:shoplist/data/repositories/dbProvider.dart';
 
 final newListProvider =
     NotifierProvider<NewListNotifier, ShoppingList?>(NewListNotifier.new);
@@ -53,15 +52,5 @@ class NewListNotifier extends Notifier<ShoppingList?> {
 
     final updated = [...state!.shoppingItems]..removeAt(index);
     state = state!.copyWith(shoppingItems: updated);
-  }
-
-  // ------------------------------------------------------------
-  // Liste speichern (Hive)
-  // ------------------------------------------------------------
-  Future<void> saveList() async {
-    if (state == null) return;
-
-    final db = await ref.read(dbProvider.future);
-    await db.saveList(state!);
   }
 }

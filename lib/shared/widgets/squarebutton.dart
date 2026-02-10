@@ -26,7 +26,9 @@ class SquareButton extends StatelessWidget {
         return Icons.remove;
       case SquareButtonMode.list:
       default:
-        return isShopped ? Icons.check : Icons.close;
+        // isShopped == false => Häkchen
+        // isShopped == true  => Kreuz
+        return isShopped ? Icons.close : Icons.check;
     }
   }
 
@@ -63,7 +65,7 @@ class SquareButton extends StatelessWidget {
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ))
-                : null, // Fav-Buttons haben keine Gradient-Farbe
+                : null,
             color: mode != SquareButtonMode.list ? _getColor() : null,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.black12),

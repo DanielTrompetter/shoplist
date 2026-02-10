@@ -31,7 +31,9 @@ class CategoryManager {
       categoryIcons[category] ?? LucideIcons.helpCircle;
 }
 
-/// DbInterface – aktuell nur Hive
+/// ------------------------------------------------------------
+/// DbInterface – jetzt NUR noch zum Öffnen der Hive-Boxen.
+/// ------------------------------------------------------------
 class DbInterface {
   final Box<ShoppingList> hiveBox;
 
@@ -39,28 +41,16 @@ class DbInterface {
     required this.hiveBox,
   });
 
-  /// Factory für Riverpod FutureProvider
+  /// Wird einmal beim App-Start über Riverpod geladen
   static Future<DbInterface> create() async {
-    // ✔ Favoriten-Box öffnen
+    // Favoriten-Box öffnen
     await Hive.openBox<FavItem>('favorites');
 
-    // ✔ ShoppingLists-Box öffnen
+    // ShoppingLists-Box öffnen
     final hiveBox = await Hive.openBox<ShoppingList>('shoppingLists');
 
     return DbInterface._(
       hiveBox: hiveBox,
     );
-  }
-
-  // --- ShoppingLists ---
-  Future<List<ShoppingList>> loadLists() async =>
-      hiveBox.values.toList();
-
-  Future<void> saveList(ShoppingList list) async {
-    await hiveBox.put(list.name, list);
-  }
-
-  Future<void> deleteList(String name) async {
-    await hiveBox.delete(name);
   }
 }

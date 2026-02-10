@@ -14,9 +14,7 @@ class FavScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ------------------------------------------------------------
-    // Argumente aus der Navigation holen
-    // ------------------------------------------------------------
+    // 🔹 HIER: Arguments korrekt auslesen
     final args = ModalRoute.of(context)?.settings.arguments as Map?;
     final origin = args?['origin'] as Screen?;
     final onAddItem = args?['onAddItem'] as void Function(ShoppingItem)?;
@@ -32,13 +30,14 @@ class FavScreen extends ConsumerWidget {
           elevation: 4,
         ),
         body: const Center(child: Text('Noch keine Favoriten')),
-        bottomNavigationBar: const Slbottomnavbar(origin: Screen.favorites),
+        bottomNavigationBar: Slbottomnavbar(
+          origin: Screen.favorites,
+          onAddItem: onAddItem, // wichtig, sonst sind die kleinen Plus-Buttons immer aus
+        ),
       );
     }
 
-    // ------------------------------------------------------------
     // Favoriten nach Kategorie gruppieren
-    // ------------------------------------------------------------
     final Map<String, List<FavItem>> groupedItems = {};
     for (var item in favorites) {
       groupedItems.putIfAbsent(item.category, () => []).add(item);
@@ -86,9 +85,7 @@ class FavScreen extends ConsumerWidget {
                     isNewItem: false,
                     isFavoriteMode: true,
 
-                    // ------------------------------------------------------------
-                    // Editieren eines Favoriten
-                    // ------------------------------------------------------------
+                    // Edit
                     onEdit: () async {
                       final editedShoppingItem =
                           await showModalBottomSheet<ShoppingItem>(
@@ -103,7 +100,8 @@ class FavScreen extends ConsumerWidget {
 
                       if (editedShoppingItem != null) {
                         final index = favorites.indexOf(fav);
-                        final updatedFav = FavItem.fromShoppingItem(editedShoppingItem);
+                        final updatedFav =
+                            FavItem.fromShoppingItem(editedShoppingItem);
 
                         ref
                             .read(favoritesProvider.notifier)
@@ -111,9 +109,7 @@ class FavScreen extends ConsumerWidget {
                       }
                     },
 
-                    // ------------------------------------------------------------
-                    // Minus-Button (Favorit entfernen)
-                    // ------------------------------------------------------------
+                    // Minus
                     onRemoveFavorite: () {
                       final index = favorites.indexOf(fav);
                       ref.read(favoritesProvider.notifier).removeFavorite(index);
@@ -127,17 +123,16 @@ class FavScreen extends ConsumerWidget {
                       );
                     },
 
-                    // ------------------------------------------------------------
-                    // Plus-Button: Item in die Liste einfügen
-                    // Nur sichtbar, wenn onAddItem != null
-                    // ------------------------------------------------------------
+                    // Kleiner Plus-Button rechts:
+                    // nur sichtbar, wenn onAddItem != null
                     onAddFavorite: onAddItem != null
                         ? () {
                             onAddItem!(fav.toShoppingItem());
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('„${fav.name}“ zur Liste hinzugefügt'),
+                                content:
+                                    Text('„${fav.name}“ zur Liste hinzugefügt'),
                                 duration: const Duration(seconds: 2),
                                 behavior: SnackBarBehavior.floating,
                               ),
@@ -164,7 +159,9 @@ class FavScreen extends ConsumerWidget {
       ),
       body: Stack(
         children: [
-          Positioned.fill(child: Image.asset('assets/Neutral.png', fit: BoxFit.cover)),
+          Positioned.fill(
+            child: Image.asset('assets/Neutral.png', fit: BoxFit.cover),
+          ),
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -190,12 +187,9 @@ class FavScreen extends ConsumerWidget {
           ),
         ],
       ),
-
-      // ------------------------------------------------------------
-      // BottomNavBar: origin bleibt favorites
-      // ------------------------------------------------------------
-      bottomNavigationBar: const Slbottomnavbar(
+      bottomNavigationBar: Slbottomnavbar(
         origin: Screen.favorites,
+        onAddItem: onAddItem, // hier auch durchreichen
       ),
     );
   }

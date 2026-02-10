@@ -97,8 +97,7 @@ class ListButton extends StatelessWidget {
                           'x${item.amount}',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                          ),
+                            color: Colors.black87),
                         ),
                       ],
                     ),
@@ -131,7 +130,11 @@ class ListButton extends StatelessWidget {
               width: 56,
               child: SquareButton(
                 mode: SquareButtonMode.list,
-                isShopped: isNewItem || item.shopped,
+
+                // NewListScreen: immer Kreuz
+                // ListScreen: Häkchen/Kreuz je nach item.shopped
+                isShopped: isNewItem ? true : item.shopped,
+
                 onPressed: onToggleShopped,
               ),
             ),

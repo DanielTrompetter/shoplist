@@ -6,6 +6,7 @@ import 'package:shoplist/data/models/shoppingItem.dart';
 import 'package:shoplist/data/models/shoppingList.dart';
 import 'package:shoplist/data/repositories/dbinterface.dart';
 import 'package:shoplist/features/shoplist/providers/newListProvider.dart';
+import 'package:shoplist/features/shoplist/providers/shoppingListprovider.dart';
 import 'package:shoplist/shared/widgets/listbutton.dart';
 import 'package:shoplist/shared/widgets/edititempopup.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
@@ -87,7 +88,6 @@ class NewListScreen extends ConsumerWidget {
         elevation: 4,
       ),
 
-
       body: Stack(
         children: [
           Positioned.fill(child: Image.asset('assets/Neutral.png', fit: BoxFit.cover)),
@@ -114,12 +114,20 @@ class NewListScreen extends ConsumerWidget {
 
       bottomNavigationBar: Slbottomnavbar(
         origin: Screen.newlist,
+
+        // ⭐ Items zur neuen Liste hinzufügen
         onAddItem: (item) {
           ref.read(newListProvider.notifier).addItem(item);
         },
+
+        // ⭐ WICHTIG: Liste über shoppingListProvider speichern!
         onSaveList: () async {
-          await ref.read(newListProvider.notifier).saveList();
-          Navigator.pop(context, true); // HomeScreen kann refreshen
+          final list = ref.read(newListProvider)!;
+
+          // Liste über Provider speichern (NICHT direkt über DB!)
+          ref.read(shoppingListProvider.notifier).addList(list);
+
+          Navigator.pop(context, true);
         },
       ),
     );

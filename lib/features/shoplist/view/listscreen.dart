@@ -81,6 +81,7 @@ class ListScreen extends ConsumerWidget {
                   item: item,
                   isNewItem: false,
                   isFavoriteMode: false,
+
                   onEdit: () async {
                     final editedItem = await showModalBottomSheet<ShoppingItem>(
                       context: context,
@@ -102,6 +103,7 @@ class ListScreen extends ConsumerWidget {
                           .updateList(shoppingList.name, updatedList);
                     }
                   },
+
                   onToggleShopped: () {
                     final updatedItems = [...shoppingList.shoppingItems];
                     final index = updatedItems.indexOf(item);
@@ -159,8 +161,22 @@ class ListScreen extends ConsumerWidget {
           ),
         ],
       ),
+
       bottomNavigationBar: Slbottomnavbar(
         origin: Screen.listScreen,
+
+        // ← Das hat vorher gefehlt!
+        onAddItem: (ShoppingItem item) {
+          final updatedItems = [...shoppingList.shoppingItems, item];
+
+          final updatedList = shoppingList.copyWith(
+            shoppingItems: updatedItems,
+          );
+
+          ref.read(shoppingListProvider.notifier)
+              .updateList(shoppingList.name, updatedList);
+        },
+
         onDeleteList: () async {
           final confirm = await showDialog<bool>(
             context: context,
@@ -183,11 +199,10 @@ class ListScreen extends ConsumerWidget {
           );
 
           if (confirm == true) {
-            final db = await ref.read(dbProvider.future);
-            await db.deleteList(shoppingList.name);
-            Navigator.pop(context, true); // HomeScreen refresht
+            ref.read(shoppingListProvider.notifier).deleteList(shoppingList.name);
+            Navigator.pop(context, true);
           }
-        }
+        },
       ),
     );
   }
