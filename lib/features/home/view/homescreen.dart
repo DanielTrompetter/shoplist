@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shoplist/core/app_config.dart';
-import 'package:shoplist/data/models/shoppingList.dart';
-import 'package:shoplist/app.dart';
 import 'package:shoplist/data/repositories/dbinterface.dart';
 import 'package:shoplist/features/home/widgets/carousellbutton.dart';
 import 'package:shoplist/features/home/widgets/centerrectandlogo.dart';
 import 'package:shoplist/features/home/widgets/shoplistcarousell.dart';
 import 'package:shoplist/shared/widgets/slbottomnavbar.dart';
 import 'package:shoplist/features/shoplist/providers/shoppingListprovider.dart';
-import 'package:shoplist/shared/widgets/newlistdialog.dart';
-import 'package:shoplist/features/shoplist/view/newlistscreen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});

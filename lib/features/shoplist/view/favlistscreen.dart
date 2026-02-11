@@ -103,9 +103,7 @@ class FavScreen extends ConsumerWidget {
                         final updatedFav =
                             FavItem.fromShoppingItem(editedShoppingItem);
 
-                        ref
-                            .read(favoritesProvider.notifier)
-                            .editFavorite(index, updatedFav);
+                        ref.read(favoritesProvider.notifier).editFavorite(index, updatedFav);
                       }
                     },
 
