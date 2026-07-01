@@ -125,7 +125,7 @@ class FavScreen extends ConsumerWidget {
                     // nur sichtbar, wenn onAddItem != null
                     onAddFavorite: onAddItem != null
                         ? () {
-                            onAddItem!(fav.toShoppingItem());
+                            onAddItem(fav.toShoppingItem());
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
